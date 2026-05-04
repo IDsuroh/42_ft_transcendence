@@ -1,0 +1,9 @@
+# Backend framework -> installs newest safe version of Django
+Django==5.2.14
+
+# PostgreSQL driver used by Django to connect to PostgreSQL (Connector)
+# Install psycopg with its binary extra. (prebuilt binary)
+psycopg[binary]>=3.1
+
+# Python library/package that reads configuration values from environment variables from .env
+python-decouple>=3.8
