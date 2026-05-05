@@ -14,6 +14,7 @@ COPY    requirements.txt .
 
 # Update python package installer (pip) and Install everything in requirements.txt\
 # -r means requirement file, --no-cache-dir means don't keep pip's download cache
+# For example, packages will be in /usr/local/lib/python3.13/site-packages/
 RUN     pip install --upgrade pip
 RUN     pip install --no-cache-dir -r requirements.txt
 
@@ -30,3 +31,18 @@ EXPOSE  8000
 # 0.0.0.0 means "listen on all available network interfaces"
 # We gotta change this in the future
 CMD     ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# / Django Python Container
+# ├── app/
+# │   ├── requirements.txt
+# │   ├── manage.py
+# │   └── config/
+# │
+# └── usr/
+#     └── local/
+#         └── lib/
+#             └── python3.12/
+#                 └── site-packages/
+#                     ├── django/
+#                     ├── psycopg/
+#                     └── decouple/

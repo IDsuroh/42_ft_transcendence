@@ -1,0 +1,29 @@
+# Define all containers/services for the project
+services:
+  # Django backend service
+  backend:
+    build: ./backend
+    container_name: transcendence_backen
+    # Expose backend port to host machine
+    ports:
+      - "8000:8000"
+    # Load environment variables from .env
+    env_file:
+      - .env
+    # Start db service before backend
+    depends_on:
+      - db
+
+  # PostgreSQL database service
+  db:
+    image: postgres:16
+    container_name: transcendence_db
+    env_file:
+      - .env
+    # Persist database files in a Docker named volume
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# Declare named volumes used by services
+volumes:
+  postgres_data:
