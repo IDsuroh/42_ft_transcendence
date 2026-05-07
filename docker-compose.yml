@@ -3,7 +3,7 @@ services:
   # Django backend service
   backend:
     build: ./backend
-    container_name: transcendence_backen
+    container_name: transcendence_backend
     # Expose backend port to host machine
     ports:
       - "8000:8000"
