@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 '''
 INSTALLED_APPS = [
     'users',    # In Django, Apps are features
+    'rest_framework',   # add REST framework
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

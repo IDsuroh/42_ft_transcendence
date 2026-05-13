@@ -7,3 +7,8 @@ psycopg[binary]>=3.1
 
 # Python library/package that reads configuration values from environment variables from .env
 python-decouple>=3.8
+
+# Toolkit for building REST API endpoints with Django
+# API -> a way for the frontend and backend to talk to each other
+# REST uses HTTP methods
+djangorestframework>=3.15
