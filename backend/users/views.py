@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth import login
 
 from .serializers import SignupSerializer
 
@@ -69,3 +70,27 @@ class SignupView(APIView):
 #   custom validate_password errors
 #   model/unique validation errors
 #   other serializer validation errors
+
+class LoginView(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+		serializer = LoginSerializer(data=request.data)
+
+		if serializer.is_valid():
+			# From the validated_data dictionary, get the value stored under the "user" key.
+			user = serializer.validated_data["user"]
+
+			# Django login function. Creates a session for the user.
+			login(request, user)
+
+			return Response(
+				{
+					"id": user.id,
+					"username": user.username,
+					"email": user.email,
+				},
+				status=status.HTTP_200_OK,
+			)
+
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
