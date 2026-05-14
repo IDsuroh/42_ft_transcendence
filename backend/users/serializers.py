@@ -49,3 +49,6 @@ class SignupSerializer(serializers.ModelSerializer):
 # - Python/Django objects
 # - Database models
 # To serialize means to convert complex object into a format that can be transferred or stored.
+# This file is responsible for:
+# - Checking the signup data
+# - Creating users safely
