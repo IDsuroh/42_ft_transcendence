@@ -1,0 +1,20 @@
+curl -X POST http://localhost:8000/api/users/signup/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "playern",
+    "email": "playern@example.com",
+    "password": "VeryStrongPassword123!"
+  }'
+Testing signup curl command.
+
+docker compose exec db psql -U django -d transcendence_database
+Enter transcendence_database
+
+SELECT id, username, email, is_staff, is_superuser FROM users_user;
+inspect user info
+
+DELETE FROM users_user WHERE username = 'playern';
+delete player number n
+
+\q
+Exit PostgreSQL
