@@ -54,25 +54,29 @@ class SignupSerializer(serializers.ModelSerializer):
 # - Creating users safely
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField()	# converts to string and validates if it is an email
+    password = serializers.CharField(write_only=True)	# value should be text/string
 
     def validate(self, data):
-        email = data.get("email")
+        email = data.get("email")	# gets value from the python dictionary
         password = data.get("password")
 
-        try:
+        try:	# Try to find a user with this email, if found, user becomes a Django User obj
             user = User.objects.get(email=email)
-        except User.DoesNotExist:
+        except User.DoesNotExist:	# return error if none
             raise serializers.ValidationError("Invalid email or password.")
         
-        user = authenticate(
+        user = authenticate(	# not Serializer function from authentication system
             username=user.username,
-            password=password,
+            password=password,	# checks raw password against stored hash
         )
 
-        if user is None:
+        if user is None:	# authenticate(returns None when authentication fails)
             raise serializers.ValidationError("Invalid email or password.")
         
-        data["user"] = user
+        data["user"] = user	# add a new key-value pair to the data dictionary
         return data
+
+# validate(self, data) = validates all field together (email and password)
+# ModelSerializer is more used for creating Django Model objects
+# Serializer is more used for manual definition or validation of data
