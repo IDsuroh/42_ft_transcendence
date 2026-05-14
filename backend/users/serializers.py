@@ -1,5 +1,5 @@
 # Imports Django helper function, Django's built-in password validation function, REST serializer tools
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
@@ -52,3 +52,27 @@ class SignupSerializer(serializers.ModelSerializer):
 # This file is responsible for:
 # - Checking the signup data
 # - Creating users safely
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid email or password.")
+        
+        user = authenticate(
+            username=user.username,
+            password=password,
+        )
+
+        if user is None:
+            raise serializers.ValidationError("Invalid email or password.")
+        
+        data["user"] = user
+        return data
