@@ -27,3 +27,16 @@ services:
 # Declare named volumes used by services
 volumes:
   postgres_data:
+
+# Chain
+# .env
+#   ↓
+# docker-compose.yml env_file
+#   ↓
+# backend container environment
+#   ↓
+# python-decouple config()
+#   ↓
+# settings.py
+#   ↓
+# Django uses PostgreSQL

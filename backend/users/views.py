@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import login
 
-from .serializers import SignupSerializer
+from .serializers import SignupSerializer, LoginSerializer
 
 # create class that inherits from APIView (API request handler) - handles signup request
 class SignupView(APIView):
@@ -29,13 +29,13 @@ class SignupView(APIView):
             )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 # This file is responsible for:
 # - receiving the HTTP request
 # - using the serializer
 # - returning an HTTP response
 #
-# .is_valid() does: DRF does built-in validation to the fields declared in serializer.py,
+# .is_valid() does: DRF(Django REST Framework) does built-in validation to the fields declared in serializer.py,
 # then looks for custom validation -> validate_<field_name>
 #   1. Check field "username"
 #      - Is it present?

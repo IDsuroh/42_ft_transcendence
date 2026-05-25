@@ -8,7 +8,7 @@ User = get_user_model()
 
 # Create serializer class for signup (inheritance from ModelSerializer class)
 class SignupSerializer(serializers.ModelSerializer):
-    # CharField -> the field expects text/string data and block response to hide password
+    # CharField -> the field expects text/string data and blocks the response to hide/secure the password
     password = serializers.CharField(write_only=True)
 
     class Meta: # Extra settings for the class (Nested class)
@@ -63,7 +63,7 @@ class LoginSerializer(serializers.Serializer):
 
         try:	# Try to find a user with this email, if found, user becomes a Django User obj
             user = User.objects.get(email=email)
-        except User.DoesNotExist:	# return error if none
+        except User.DoesNotExist:	# return error if none <- Wrong Email Case
             raise serializers.ValidationError("Invalid email or password.")
         
         user = authenticate(	# not Serializer function from authentication system
@@ -71,12 +71,12 @@ class LoginSerializer(serializers.Serializer):
             password=password,	# checks raw password against stored hash
         )
 
-        if user is None:	# authenticate(returns None when authentication fails)
+        if user is None:	# authenticate(returns None when authentication fails) <- Wrong Password Case
             raise serializers.ValidationError("Invalid email or password.")
         
         data["user"] = user	# add a new key-value pair to the data dictionary
         return data
 
 # validate(self, data) = validates all field together (email and password)
-# ModelSerializer is more used for creating Django Model objects
+# ModelSerializer is more used for creating Django Model objects/classes
 # Serializer is more used for manual definition or validation of data
