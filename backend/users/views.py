@@ -1,9 +1,9 @@
 # Imports HTTP status, permission class, response class, API view
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 
 from .serializers import SignupSerializer, LoginSerializer
 
@@ -94,3 +94,40 @@ class LoginView(APIView):
 			)
 
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MeView(APIView):
+	permission_classes = [IsAuthenticated]	# only loggined-in users can access this
+
+	def get(self, request):
+		user = request.user	# the user Django recognized from the session cookie (temporary login ticket)
+		# Meaning: "Get the currently logged-in user for this request."
+		return Response(
+			{
+    	        "id": user.id,
+    	        "username": user.username,
+    	        "email": user.email,
+			},
+     	  	status=status.HTTP_200_OK,
+		)
+	
+# 1. User logs in with email + password.
+# 2. Django checks credentials.
+# 3. If correct, Django creates a session record in the database.
+# 4. Django sends sessionid cookie to the client.
+# 5. Later, client sends that sessionid cookie back.
+# 6. Django reads the cookie, checks the session table, and figures out:
+#    “This request belongs to player1.”
+# 7. Django sets:
+#    request.user = player1 user object
+
+class LogoutView(APIView):
+	permission_classes = [IsAuthenticated]	# Only logged-in users can log out.
+
+	def post(self, request):
+		logout(request)
+
+		return Response(
+			{"message": "Logged out successfully."},
+			status=status.HTTP_200_OK,
+		)
