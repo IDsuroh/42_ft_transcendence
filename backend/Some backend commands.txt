@@ -18,3 +18,14 @@ delete player number n
 
 \q
 Exit PostgreSQL
+
+docker compose exec backend python manage.py createsuperuser
+Create admin super user
+
+docker compose exec backend python manage.py migrate
+Migration files are only instructions.
+If this is not run, the code may exist, but the database tables may not
+Django can fail with errors like:
+- relation "users_user" does not exist
+- no such table
+- database table missing
