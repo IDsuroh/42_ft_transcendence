@@ -24,6 +24,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # React + Vite frontend service
+  frontend:
+    build: ./frontend
+    container_name: transcendence_frontend
+    # Connect the computer's localhost:5173 to frontend container's port 5173
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
 # Declare named volumes used by services
 volumes:
   postgres_data:
