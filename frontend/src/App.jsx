@@ -123,7 +123,49 @@ function App() {
 export default App
 */
 
+// import useState which lets the page remember/change a value/update the state to show what is going on
+import { useState } from 'react'
+
+// App UI Component (a function that returns JSX) App = the main frontend page function
 function App() {
+  /*
+    Calls React function 'useState' and initiate with 'No request sent yet.'
+    'state' means a value that React remembers for this component, React updates the screen when value
+    changes.
+    useState(...) returns two things. #1 Current value and #2 the function that changes the value
+    In our case, it returns message and function setMessage.
+    We save it this way because we create message in a React-managed way and not as a normal independent
+    JavaScript variable. (React automatically knows and updates messages to display as a state variable)
+  */
+  const [message, setMessage] = useState('No request sent yet.')
+
+  // declared as async because there are some operations that doesn't finish immediately
+  // async means that this function is allowed to use await inside and may contain Promises
+  async function checkCurrentUser() {
+    try {
+      /* await means do the fetch() function call and pause until the response is ready, then continue
+      fetch is a built-in browser function
+      This line of code send the HTTP request with GET to ask credentials of the account
+      and include the session cookie that was given at login */
+      const response = await fetch('http://localhost:8000/api/users/me/', {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      /* Read the response body and convert it from JSON text into a JavaScript object.
+      Reading and converting the response body can also take time */
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage(`Logged in as ${data.username} (${data.email})`)
+      } else {
+        setMessage(data.detail || 'Not logged in.')
+      }
+    } catch (error) {
+      setMessage('Could not connect to backend.')
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
       <section className="w-full max-w-md rounded-2xl bg-slate-900 p-8 shadow-lg">
@@ -133,9 +175,16 @@ function App() {
           Frontend is running with React, Vite, and Tailwind CSS.
         </p>
 
-        <button className="mt-6 w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold hover:bg-purple-700">
-          Test Button
+        <button 
+          onClick={checkCurrentUser}
+          className="mt-6 w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold hover:bg-purple-700"
+        >
+          Check Current User
         </button>
+
+        <p className="mt-4 rounded-lg bg-slate-800 p-4 text-sm text-slate-300">
+          {message}
+        </p>
       </section>
     </main>
   )
@@ -166,13 +215,18 @@ App.jsx className values get styled
 
 Once CSS is loaded globally through main.jsx, any component can use those class names.
 
+When we click the button, the browser sends a request to the Django backend:
+GET http://localhost:8000/api/users/me/
+Then Django responds with JSON
+Then React changes the text on the page based on the response
+
 The return (...)
 Returns the HTML-like UI that should appear on the screen.
 
 The export makes the App function available to other files.
 
 What is JSX (JavaScript XML) is a syntax React uses to describe what should appear on the page.
-Write JSX (looks like HTML)
+Write JSX (HTML-looking syntax written inside JavaScript.)
     ↓
 Vite converts it
     ↓
