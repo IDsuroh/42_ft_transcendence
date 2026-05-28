@@ -12,3 +12,7 @@ python-decouple>=3.8
 # API -> a way for the frontend and backend to talk to each other
 # REST uses HTTP methods
 djangorestframework>=3.15
+
+# CORS (Cross-Origin Resource Sharing) browser security rule about whether JavaScript
+# on one website is allowed to send requests to another website/origin
+django-cors-headers>=4.4

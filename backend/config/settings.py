@@ -36,6 +36,21 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 # Hosts allowed during local Docker development
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
+# Allow the React/Vite frontend to call the Django backend during development.
+# Django should allow browser JavaScript requests coming from http://localhost:5173.
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+# Allow cookies/session credentials to be included in cross-origin requests.
+CORS_ALLOW_CREDENTIALS = True
+
+# Trust the React/Vite frontend origin for CSRF-protected requests.
+# CSRF (Cross-Site Request Forgery)
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+
 # Application definition
 
 '''
@@ -51,6 +66,7 @@ INSTALLED_APPS = [
 INSTALLED_APPS = [
     'users',    # In Django, Apps are features
     'rest_framework',   # add REST framework
+    'corsheaders',  # add CORS
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,8 +75,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-MIDDLEWARE = [
+# Code that runs automatically during request/response process
+# Chain of automatic processing steps around every request/response
+MIDDLEWARE = [  
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',    # Add CORS middleware, run on top of everything else
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
