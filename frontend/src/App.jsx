@@ -138,26 +138,63 @@ function App() {
     JavaScript variable. (React automatically knows and updates messages to display as a state variable)
   */
   const [message, setMessage] = useState('No request sent yet.')
+  // input email and password and it updates the state real fast
+  const [email, setEmail] = useState('player1@example.com')
+  const [password, setPassword] = useState('VeryStrongPassword123!')
 
   // declared as async because there are some operations that doesn't finish immediately
   // async means that this function is allowed to use await inside and may contain Promises
-  async function checkCurrentUser() {
+  async function loginUser()  {
     try {
       /* await means do the fetch() function call and pause until the response is ready, then continue
       fetch is a built-in browser function
       This line of code send the HTTP request with GET to ask credentials of the account
       and include the session cookie that was given at login */
+      const response = await fetch('http://localhost:8000/api/users/login/', {
+        method: 'POST',
+        credentials: 'include',
+        // HTTP headers are extra information attached to the request
+        // its needed for the DRF to interpret the body correctly
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // JSON.stringify converts JavaScript object into JSON for the request from React go to Django
+        // Django cannot receive live JavaScript object directly
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      })
+
+      /* Read the response body and convert it from JSON text into a JavaScript object.
+      It's for React to understand the data that is parsed
+      Reading and converting the response body can also take time */
+      const data = await response.json()
+
+      if (response.ok)  {
+        setMessage(`Logged in as ${data.username} (${data.email})`)
+      } else {
+        // The value in the index [0] stored under the key non_field_errors with optional chaining
+        // If data.non_field_errors exists, get first item
+        // If data.non_field_errors doesn't exist, return undefined
+        setMessage(data.non_field_errors?.[0] || 'Login failed.')
+      }
+    } catch (error) {
+      setMessage('Could not connect to backend.')
+    }
+  }
+
+  async function checkCurrentUser() {
+    try {
       const response = await fetch('http://localhost:8000/api/users/me/', {
         method: 'GET',
         credentials: 'include',
       })
 
-      /* Read the response body and convert it from JSON text into a JavaScript object.
-      Reading and converting the response body can also take time */
       const data = await response.json()
 
       if (response.ok) {
-        setMessage(`Logged in as ${data.username} (${data.email})`)
+        setMessage(`Current user: ${data.username} (${data.email})`)
       } else {
         setMessage(data.detail || 'Not logged in.')
       }
@@ -175,12 +212,37 @@ function App() {
           Frontend is running with React, Vite, and Tailwind CSS.
         </p>
 
-        <button 
-          onClick={checkCurrentUser}
-          className="mt-6 w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold hover:bg-purple-700"
-        >
-          Check Current User
-        </button>
+        <div className="mt-6 space-y-4">
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
+            placeholder="Email"
+          />
+
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
+            placeholder="Password"
+          />
+
+          <button
+            onClick={loginUser}
+            className="w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold hover:bg-purple-700"
+          >
+            Login
+          </button>
+
+          <button 
+            onClick={checkCurrentUser}
+            className="w-full rounded-lg bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600"
+          >
+            Check Current User
+          </button>
+        </div>
 
         <p className="mt-4 rounded-lg bg-slate-800 p-4 text-sm text-slate-300">
           {message}
