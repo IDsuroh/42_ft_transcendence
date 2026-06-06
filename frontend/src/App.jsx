@@ -126,6 +126,23 @@ export default App
 // import useState which lets the page remember/change a value/update the state to show what is going on
 import { useState } from 'react'
 
+function getCookie(name)  { // This function is used to find cookies
+  /* 'document' means the current webpage loaded and 'document.cookie' gives the cookies that JavaScript
+  is allowed to read for the page. e.g. csrftoken=abc123; sessionid=xyz789; theme=dark */
+  const cookies = document.cookie.split('; ') // and this makes it into an array
+
+  for (const cookie of cookies) { // Takes this string 'csrftoken=abc123'
+    const [cookieName, cookieValue] = cookie.split('=') // make it into '["csrftoken", "abc123"]'
+
+    /* '===' means strict equality and checks if the cookie is the same with the cookie we are checking */
+    if (cookieName === name)  {
+      return cookieValue
+    }
+  }
+
+  return null
+}
+
 // App UI Component (a function that returns JSX) App = the main frontend page function
 function App() {
   /*
@@ -146,17 +163,28 @@ function App() {
   // async means that this function is allowed to use await inside and may contain Promises
   async function loginUser()  {
     try {
+      const csrfToken = getCookie('csrftoken')  // Find Django's CSRF token cookie and return its value
+
       /* await means do the fetch() function call and pause until the response is ready, then continue
       fetch is a built-in browser function
-      This line of code send the HTTP request with GET to ask credentials of the account
-      and include the session cookie that was given at login */
+      This line of code sends the HTTP request with GET to ask credentials of the account
+      and includes the session cookie that was given at login 
+      About Cookies, cookies are generated in the login function in the loginView of the backend part
+      then it is delivered to the browser and is stored in the internal storage for cookies. 
+      Later on, when we login again, or check the current user, we use this cookie to tell Django that
+      I, the user, with this cookie, is trying to see if I can do this since it's my data. If the cookie
+      is different, it means the cookie is tampered and won't be able to request any APIs to the backend.
+      (It's different if we log in as a different user because a new login will update/replace the
+      session authentication and wrong credentials will just be refused by Django after credential
+      verification. */
       const response = await fetch('http://localhost:8000/api/users/login/', {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // include cookies in the request itself
         // HTTP headers are extra information attached to the request
         // its needed for the DRF to interpret the body correctly
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
         },
         // JSON.stringify converts JavaScript object into JSON for the request from React go to Django
         // Django cannot receive live JavaScript object directly
@@ -177,7 +205,35 @@ function App() {
         // The value in the index [0] stored under the key non_field_errors with optional chaining
         // If data.non_field_errors exists, get first item
         // If data.non_field_errors doesn't exist, return undefined
-        setMessage(data.non_field_errors?.[0] || 'Login failed.')
+        setMessage(data.non_field_errors?.[0] || data.detail || 'Login failed.')
+      }
+    } catch (error) {
+      setMessage('Could not connect to backend.')
+    }
+  }
+
+  async function logoutUser() {
+    try {
+      const csrfToken = getCookie('csrftoken')
+
+      const response = await fetch('http://localhost:8000/api/users/logout/', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+      })
+
+      const data = await response.json()
+
+      if (response.ok)  {
+        setMessage(data.message || 'Logged out.')
+      } else  {
+        if (data.detail === 'Authentication credentials were not provided.')  {
+          setMessage('Already logged out.')
+        } else  {
+          setMessage(data.detail || data.message || 'Logout failed.')
+        }
       }
     } catch (error) {
       setMessage('Could not connect to backend.')
@@ -196,7 +252,11 @@ function App() {
       if (response.ok) {
         setMessage(`Current user: ${data.username} (${data.email})`)
       } else {
-        setMessage(data.detail || 'Not logged in.')
+        if (data.detail === 'Authentication credentials were not provided.')  {
+          setMessage('Not logged in.')
+        } else  {
+          setMessage(data.detail || 'Not logged in.')
+        }
       }
     } catch (error) {
       setMessage('Could not connect to backend.')
@@ -234,6 +294,13 @@ function App() {
             className="w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold hover:bg-purple-700"
           >
             Login
+          </button>
+
+          <button
+            onClick={logoutUser}
+            className="w-full rounded-lg bg-red-600 px-4 py-2 font-semibold hover:bg-red-700"
+          >
+            Logout
           </button>
 
           <button 
