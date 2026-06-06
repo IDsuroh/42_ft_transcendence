@@ -156,8 +156,12 @@ function App() {
   */
   const [message, setMessage] = useState('No request sent yet.')
   // input email and password and it updates the state real fast
-  const [email, setEmail] = useState('player1@example.com')
-  const [password, setPassword] = useState('VeryStrongPassword123!')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const [signupUsername, setSignupUsername] = useState('')
+  const [signupEmail, setSignupEmail] = useState('')
+  const [signupPassword, setSignupPassword] = useState('')
 
   // declared as async because there are some operations that doesn't finish immediately
   // async means that this function is allowed to use await inside and may contain Promises
@@ -206,6 +210,42 @@ function App() {
         // If data.non_field_errors exists, get first item
         // If data.non_field_errors doesn't exist, return undefined
         setMessage(data.non_field_errors?.[0] || data.detail || 'Login failed.')
+      }
+    } catch (error) {
+      setMessage('Could not connect to backend.')
+    }
+  }
+
+  async function signupUser() {
+    try {
+      const csrfToken = getCookie('csrftoken')
+
+      const response = await fetch('http://localhost:8000/api/users/signup/', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          username: signupUsername,
+          email: signupEmail,
+          password:signupPassword,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok)  {
+        setMessage(`Signed up as ${data.username} (${data.email})`)
+      } else  {
+        setMessage(
+          data.username?.[0] || // optional chaining: protects the code from crashing when the field doesn't exist
+          data.email?.[0] ||
+          data.password?.[0] ||
+          data.detail ||
+          'Signup failed.'
+        )
       }
     } catch (error) {
       setMessage('Could not connect to backend.')
@@ -273,6 +313,38 @@ function App() {
         </p>
 
         <div className="mt-6 space-y-4">
+
+          <input
+            type="text"
+            value={signupUsername}
+            onChange={(event) => setSignupUsername(event.target.value)}
+            className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
+            placeholder="Signup username"
+          />
+
+          <input
+            type="email"
+            value={signupEmail}
+            onChange={(event) => setSignupEmail(event.target.value)}
+            className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
+            placeholder="Signup email"
+          />
+
+          <input
+            type="password"
+            value={signupPassword}
+            onChange={(event) => setSignupPassword(event.target.value)}
+            className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
+            placeholder="Signup password"
+          />
+
+          <button
+            onClick={signupUser}
+            className="w-full rounded-lg bg-green-600 px-4 py-2 font-semibold hover:bg-green-700"
+          >
+            Signup
+          </button>
+
           <input
             type="email"
             value={email}
