@@ -125,6 +125,8 @@ export default App
 
 import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 
+import PrivacyPage from './pages/PrivacyPage'
+import TermsPage from './pages/TermsPage'
 import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
@@ -156,10 +158,26 @@ function App()  {
         >
           Home
         </Link>
+
+        <Link
+          to="/privacy"
+          className="rounded-lg bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600"
+        >
+          Privacy
+        </Link>
+
+        <Link
+          to="/terms"
+          className="rounded-lg bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600"
+        >
+          Terms
+        </Link>
       </nav>
 
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/home" element={<HomePage />} />
