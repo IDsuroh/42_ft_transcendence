@@ -40,10 +40,12 @@ services:
     container_name: transcendence_nginx
     ports:
       - "80:80"
+      - "443:443" # Host machine HTTPS port 443 → Nginx container HTTPS port 443
     # Mounts the project file "./nginx/default.conf"
     # into the Nginx container "/etc/nginx/conf.d/default.conf" but only as read-only
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro # Take the local nginx/certs folder and make it available inside the Nginx container at /etc/nginx/certs.
     depends_on:
       - frontend
       - backend

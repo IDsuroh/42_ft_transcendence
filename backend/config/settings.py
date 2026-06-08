@@ -36,19 +36,27 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 # Hosts allowed during local Docker development
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
-# Allow the React/Vite frontend to call the Django backend during development.
-# Django should allow browser JavaScript requests coming from http://localhost:5173.
+# Allow frontend origins to call the Django backend during development.
+# These are the browser origins that Django will allow for cross-origin JavaScript requests.
+# http://localhost:5173 is the direct Vite development server.
+# http://localhost and https://localhost are the Nginx reverse-proxy entrypoints.
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost",
+    "https://localhost",
 ]
 
 # Allow cookies/session credentials to be included in cross-origin requests.
 CORS_ALLOW_CREDENTIALS = True
 
-# Trust the React/Vite frontend origin for CSRF-protected requests.
+# Trust these frontend origins for CSRF-protected requests such as POST login, signup, and logout.
+# This does not disable CSRF protection; it only tells Django these origins are allowed to send CSRF-checked requests.
+# https://localhost is needed after adding HTTPS through Nginx.
 # CSRF (Cross-Site Request Forgery)
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost",
+    "https://localhost",
 ]
 
 # Application definition
