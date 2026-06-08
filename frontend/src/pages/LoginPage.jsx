@@ -25,6 +25,16 @@ function LoginPage()    {
    // async means that this function is allowed to use await inside and may contain 'Promises'
    async function loginUser()   {
     try {
+        if (!email.trim())  {
+            setMessage('Email is required.')
+            return
+        }
+
+        if (!password)  {
+            setMessage('Password is required.')
+            return
+        }
+
         const csrfToken = getCookie('csrftoken')    // Find Django's CSRF token cookie and return
 
         /*
