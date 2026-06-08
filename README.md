@@ -363,7 +363,7 @@ openssl req -x509 -nodes -days 365 \
   -out nginx/certs/localhost.crt \
   -subj "/CN=localhost"
 
-docker compose up --build
+docker compose up --build -d
 ```
 
 Then open:
