@@ -32,7 +32,7 @@ function HomePage() {
                 We do not need X-CSRFToken here because this is a GET request.
                 CSRF protection is mainly needed for unsafe/changing requests like POST.
             */
-            const response = await fetch('http://localhost:8000/api/users/me/', {
+            const response = await fetch('/api/users/me/', {
                 method: 'GET',
                 credentials: 'include',
             })
@@ -82,7 +82,7 @@ function HomePage() {
 
                 We do not need Content-Type: application/json here because logout sends no JSON body.
             */
-            const response = await fetch('http://localhost:8000/api/users/logout/', {
+            const response = await fetch('/api/users/logout/', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

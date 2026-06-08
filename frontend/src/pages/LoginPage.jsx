@@ -44,7 +44,7 @@ function LoginPage()    {
             credentials: 'include' means this request can include/store cookies.
             X-CSRFToken is sent because login is a POST request.
         */
-        const response = await fetch('http://localhost:8000/api/users/login/', {
+        const response = await fetch('/api/users/login/', {
             method: 'POST',
             credentials: 'include', // include cookies in the request itself
             // HTTP headers are extra information attached to the request

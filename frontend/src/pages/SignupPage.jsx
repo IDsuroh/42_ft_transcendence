@@ -48,7 +48,7 @@ function SignupPage()   {
                 credentials: 'include' means this request can include/store cookies.
                 X-CSRFToken is sent because signup is a POST request.
             */
-            const response = await fetch('http://localhost:8000/api/users/signup/', {
+            const response = await fetch('/api/users/signup/', {
                 method: 'POST',
                 credentials: 'include',
                 // HTTP headers are extra information attached to the request.
