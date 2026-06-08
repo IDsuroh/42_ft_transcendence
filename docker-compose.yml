@@ -24,15 +24,23 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # React + Vite frontend service
+  # React frontend build service
   frontend:
     build: ./frontend
     container_name: transcendence_frontend
+    # The frontend container builds React into /app/dist which contains the finished compiled result
+    # that Nginx can serve.
+    # Save that /app/dist folder into a Docker named volume called frontend_dist.
+    volumes:
+      - frontend_dist:/app/dist
     # Connect the computer's localhost:5173 to frontend container's port 5173
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
+    # ports:
+    #   - "5173:5173"
+    # depends_on:
+    #   - backend
+    # No ports are needed because the frontend container no longer runs the Vite dev server.
+    # It only builds static files into /app/dist for Nginx to serve.
+    # and because the frontend build does not need the backend running.
   
   # Nginx as reverse proxy
   nginx:
@@ -45,7 +53,13 @@ services:
     # into the Nginx container "/etc/nginx/conf.d/default.conf" but only as read-only
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro # Take the local nginx/certs folder and make it available inside the Nginx container at /etc/nginx/certs.
+      # Take the local nginx/certs folder and make it available
+      # inside the Nginx container at /etc/nginx/certs.
+      - ./nginx/certs:/etc/nginx/certs:ro
+      # Nginx reads the built React files from /usr/share/nginx/html.
+      # Take the Docker named volume called frontend_dist and mount it inside the Nginx container at
+      # /usr/share/nginx/html and make it read-only inside Nginx.
+      - frontend_dist:/usr/share/nginx/html:ro
     depends_on:
       - frontend
       - backend
@@ -53,6 +67,7 @@ services:
 # Declare named volumes used by services
 volumes:
   postgres_data:
+  frontend_dist:
 
 # Chain
 # .env
@@ -66,3 +81,11 @@ volumes:
 # settings.py
 #   ↓
 # Django uses PostgreSQL
+# 
+# frontend container writes built files into /app/dist
+#         ↓
+# that folder is backed by Docker volume frontend_dist
+#         ↓
+# nginx container sees the same volume at /usr/share/nginx/html
+#         ↓
+# nginx serves those files to the browser

@@ -30,7 +30,14 @@ EXPOSE  8000
 # Running the "development server" which is for development
 # 0.0.0.0 means "listen on all available network interfaces"
 # We gotta change this in the future
-CMD     ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD     ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# Start Gunicorn instead of Django's development server.
+# config.wsgi:application means:
+# - load backend/config/wsgi.py
+# - use the application object inside that file
+# Gunicorn listens on port 8000 inside the backend container.
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
 
 # / Django Python Container
 # ├── app/

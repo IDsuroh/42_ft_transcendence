@@ -6,8 +6,9 @@ This repository currently contains the mandatory base infrastructure:
 
 - Django backend
 - Django REST Framework API
+- Gunicorn backend application server
 - PostgreSQL database
-- React frontend with Vite
+- React frontend built with Vite and served by Nginx
 - Tailwind CSS
 - Docker Compose
 - Nginx reverse proxy
@@ -23,6 +24,7 @@ This repository currently contains the mandatory base infrastructure:
 - Python
 - Django
 - Django REST Framework
+- Gunicorn
 - PostgreSQL
 - psycopg
 - python-decouple
@@ -137,7 +139,13 @@ For local development, choose the advanced/proceed option in the browser.
 From the project root:
 
 ```bash
-docker compose up --build
+docker compose up --build -d
+```
+
+Apply database migrations:
+
+```bash
+docker compose exec backend python manage.py migrate
 ```
 
 Then open:
@@ -156,15 +164,32 @@ https://localhost/privacy
 https://localhost/terms
 ```
 
+Why migrations are needed:
+
+```text
+Django migrations create or update the database tables required by the project.
+
+For example:
+- user table
+- session table
+- Django internal tables
+```
+
+This step is required after a fresh database is created, for example after a fresh clone or after running:
+
+```bash
+docker compose down -v
+```
+
 ## Docker Services
 
 Docker Compose starts these services:
 
 ```text
 db        PostgreSQL database
-backend   Django backend API
-frontend  React/Vite frontend
-nginx     HTTPS reverse proxy
+backend   Django backend API running through Gunicorn
+frontend  React/Vite build service that creates static frontend files
+nginx     HTTPS reverse proxy and static frontend server
 ```
 
 The browser connects to Nginx first:
@@ -174,15 +199,69 @@ Browser
   ↓ HTTPS
 Nginx
   ↓
-Frontend or Backend
+Built React static files or backend API
 ```
 
 Nginx routes requests like this:
 
 ```text
-/      → frontend container
-/api/  → backend container
+/      → built React static files served by Nginx
+/api/  → backend container running Gunicorn/Django
 ```
+
+## Frontend Build
+
+The frontend is built with Vite using:
+
+```bash
+npm run build
+```
+
+During Docker image build, the frontend service creates production frontend files in:
+
+```text
+/app/dist
+```
+
+That folder is stored in the Docker named volume:
+
+```text
+frontend_dist
+```
+
+Nginx mounts the same volume at:
+
+```text
+/usr/share/nginx/html
+```
+
+This allows Nginx to serve the built React frontend directly.
+
+React Router frontend routes such as `/signup`, `/login`, `/home`, `/privacy`, and `/terms` are handled by Nginx returning `index.html` when the requested path is not a real file.
+
+## Backend Server
+
+The backend runs through Gunicorn instead of Django's development server.
+
+Request flow:
+
+```text
+Browser
+  ↓ HTTPS
+Nginx
+  ↓ /api/
+Gunicorn
+  ↓
+Django
+```
+
+Gunicorn runs Django through the WSGI application:
+
+```text
+config.wsgi:application
+```
+
+This makes the backend setup closer to a deployment-style configuration.
 
 ## Backend API Endpoints
 
@@ -270,28 +349,6 @@ Completed mandatory base features:
 - Terms of Service page
 - Basic frontend validation for empty fields
 
-## Development Notes
-
-> **Finalization note:**  
-> This section should be revisited before final project submission.  
-> The current setup still uses development servers, such as Django's development server for the backend and Vite's development server for the frontend.  
-> During finalization, we should decide whether to keep this setup for evaluation or move closer to a production-style setup, such as serving the built frontend static files through Nginx.
-
-The frontend currently runs using the Vite development server inside Docker.
-
-The backend currently runs using Django's development server inside Docker.
-
-When using Vite behind Nginx, the browser may show a Vite WebSocket/HMR warning in the console. This warning is related to development live reload and does not block the application logic.
-
-For a more production-style frontend setup later, the frontend can be built with:
-
-```bash
-npm run build
-```
-
-and served as static files through Nginx.
-**Django's development server for the backend and Vite's development server for the frontend.**
-
 ## Security Notes
 
 - Passwords are handled by Django authentication and are not stored in plain text.
@@ -366,14 +423,15 @@ openssl req -x509 -nodes -days 365 \
 docker compose up --build -d
 ```
 
+Apply database migration (Django’s way of creating or updating database tables.):
+* It's most likely because of this when we do docker compose down -v and up again, it says 'Could not connect to backend' *
+
+```bash
+docker compose exec backend python manage.py migrate
+```
+
 Then open:
 
 ```text
 https://localhost/
 ```
-
-> [!NOTE]
-> This section should be revisited before final project submission.
-> The current setup still uses development servers, such as Django's development server for the backend and Vite's development server for the frontend.
-> During finalization, we should decide whether to keep this setup for evaluation or move closer to a production-style setup, such as serving the built frontend static files through Nginx.
-**Django's development server for the backend and Vite's development server for the frontend.**

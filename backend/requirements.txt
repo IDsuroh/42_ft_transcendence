@@ -16,3 +16,10 @@ djangorestframework>=3.15
 # CORS (Cross-Origin Resource Sharing) browser security rule about whether JavaScript
 # on one website is allowed to send requests to another website/origin
 django-cors-headers>=4.4
+
+# Gunicorn runs the Django backend in a more deployment-style way instead of Django's development server.
+# It receives backend API requests from Nginx and runs Django's WSGI application.
+# WSGI is the standard contract/rule that lets a Python web server (Gunicorn)
+# communicate with a Python web app (Django).
+# Gunicorn's job is to sit on port 8000 inside the backend container and receive requests from Nginx
+gunicorn>=23.0
