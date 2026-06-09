@@ -1,2 +1,7 @@
 .env
 .vscode
+
+# Local HTTPS certificates generated for development
+nginx/certs/*.key
+nginx/certs/*.crt
+nginx/certs/*.pem
