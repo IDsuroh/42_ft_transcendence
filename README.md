@@ -475,6 +475,23 @@ To run this project from a fresh clone:
 
 ```bash
 cp .env.example .env
+```
+
+Generate local HTTPS certificates.
+
+Recommended method using `mkcert`:
+
+```bash
+mkdir -p nginx/certs
+
+mkcert -key-file nginx/certs/localhost.key \
+  -cert-file nginx/certs/localhost.crt \
+  localhost 127.0.0.1 ::1
+```
+
+If `mkcert` is not available, you can use an OpenSSL self-signed certificate instead:
+
+```bash
 mkdir -p nginx/certs
 
 openssl req -x509 -nodes -days 365 \
@@ -482,19 +499,42 @@ openssl req -x509 -nodes -days 365 \
   -keyout nginx/certs/localhost.key \
   -out nginx/certs/localhost.crt \
   -subj "/CN=localhost"
+```
 
+The OpenSSL method enables HTTPS, but Chrome may show a certificate trust warning because the certificate is self-signed.
+
+Start the project:
+
+```bash
 docker compose up --build -d
 ```
 
-Apply database migration (Django’s way of creating or updating database tables.):
-* It's most likely because of this when we do docker compose down -v and up again, it says 'Could not connect to backend' *
+Apply database migrations:
 
 ```bash
 docker compose exec backend python manage.py migrate
+```
+
+Django migrations create or update the database tables required by the project, such as user, session, and internal Django tables.
+
+This migration step is required after a fresh clone or after resetting Docker volumes with:
+
+```bash
+docker compose down -v
 ```
 
 Then open:
 
 ```text
 https://localhost/
+```
+
+Available pages:
+
+```text
+https://localhost/signup
+https://localhost/login
+https://localhost/home
+https://localhost/privacy
+https://localhost/terms
 ```
