@@ -123,7 +123,7 @@ function App() {
 export default App
 */
 
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 
 import PrivacyPage from './pages/PrivacyPage'
 import TermsPage from './pages/TermsPage'
@@ -175,7 +175,7 @@ function App()  {
       </nav>
 
       <Routes>
-        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -210,9 +210,6 @@ Route
 
 Link
 = React Router link used to move to another frontend page without manually refreshing.
-
-Navigate
-= redirects one route to another route.
 
 Current frontend routes:
   /       → redirects to /home

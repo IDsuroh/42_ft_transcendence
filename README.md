@@ -107,7 +107,68 @@ The real `.env` file should not be committed to Git.
 
 ## HTTPS Certificate Setup
 
-For local HTTPS development, generate a self-signed certificate:
+This project uses HTTPS locally through certificates mounted into the Nginx container.
+
+Certificate files are expected at:
+
+```text
+nginx/certs/localhost.crt
+nginx/certs/localhost.key
+```
+
+These files are generated locally and should not be committed to Git.
+
+### Recommended method: mkcert
+
+For a cleaner local Chrome experience, use `mkcert` to create a locally trusted certificate.
+
+Install the required browser trust tooling:
+
+```bash
+sudo apt update
+sudo apt install libnss3-tools
+```
+
+Install `mkcert`:
+
+```bash
+sudo apt install mkcert
+```
+
+If `mkcert` is not available through your package manager, install it using the official method for your operating system.
+
+Then install the local certificate authority:
+
+```bash
+mkcert -install
+```
+
+Generate the localhost certificate:
+
+```bash
+mkdir -p nginx/certs
+
+mkcert -key-file nginx/certs/localhost.key \
+  -cert-file nginx/certs/localhost.crt \
+  localhost 127.0.0.1 ::1
+```
+
+This creates:
+
+```text
+nginx/certs/localhost.crt
+nginx/certs/localhost.key
+```
+
+Nginx uses these files to serve the project through:
+
+```text
+https://localhost/
+```
+
+### Alternative method: OpenSSL self-signed certificate
+
+If `mkcert` is not used, a self-signed certificate can be generated with OpenSSL:
 
 ```bash
 mkdir -p nginx/certs
@@ -119,20 +180,13 @@ openssl req -x509 -nodes -days 365 \
   -subj "/CN=localhost"
 ```
 
-This creates:
+This also enables HTTPS, but Chrome may show a warning such as:
 
 ```text
-nginx/certs/localhost.crt
-nginx/certs/localhost.key
+net::ERR_CERT_AUTHORITY_INVALID
 ```
 
-The certificate is self-signed, so the browser may show a security warning when visiting:
-
-```text
-https://localhost
-```
-
-For local development, choose the advanced/proceed option in the browser.
+because the certificate is self-signed and not trusted by the operating system/browser.
 
 ## Run the Project
 
@@ -359,14 +413,23 @@ Completed mandatory base features:
 
 ## Certificate Key Note
 
-The current repository may contain a local self-signed `localhost.key` used only for development HTTPS testing.
+Local HTTPS certificate files are generated for development and should not be committed to Git.
 
-Before final cleanup, this should be revisited. Preferably:
+The following files are ignored:
 
-- stop tracking `nginx/certs/localhost.key`
-- add `nginx/certs/*.key` to `.gitignore`
-- document certificate generation in this README
-- regenerate local certificates if needed
+```text
+nginx/certs/*.key
+nginx/certs/*.crt
+nginx/certs/*.pem
+```
+
+The private key file is especially sensitive:
+
+```text
+nginx/certs/localhost.key
+```
+
+Each developer should generate their own local certificates by following the HTTPS Certificate Setup section.
 
 ## Useful Commands
 
