@@ -1,0 +1,378 @@
+Before anything, we have to understand the big picture. This project is a full stack web app where we have the frontend, backend, database, and the 'infrastructure'
+connecting them.
+
+Before we look at any code, we need to understand the shape of the system.
+
+Our project is not one single program.
+
+It is several programs working together:
+
+Browser
+= Chrome
+= program used by the user to open the website
+
+Web server
+= Nginx
+= first server-side program that receives browser requests
+
+Frontend app
+= React
+= JavaScript app that runs inside Chrome after Nginx sends it to the browser
+
+Frontend build tool
+= Vite
+= tool that converts our React development files into final browser-ready files
+
+Backend application server
+= Gunicorn
+= Python server process that runs Django and receives backend requests from Nginx
+
+Backend framework/application
+= Django
+= Python framework where our backend logic lives
+
+API framework
+= Django REST Framework
+= Django extension that helps us build JSON API endpoints
+
+Database
+= PostgreSQL
+= stores persistent data like users and sessions
+
+Containers
+= Docker
+= packages each service into isolated environments
+
+Container manager
+= Docker Compose
+= starts and connects db, backend, frontend build, and nginx services
+
+User / Browser
+      ↓ HTTPS request
+    Nginx
+      ├── serves built React frontend files
+      │
+      └── forwards /api/ requests
+              ↓
+          Gunicorn
+              ↓
+            Django
+              ↓
+          PostgreSQL
+
+1. Browser
+    The browser is the only thing the user directly interacts with. When the user opens https://localhost/, clicks a button, fills a form, signs up, or logs in, all of that starts from the browser.
+
+    The browser does not directly talk to Django.
+    The browser does not directly talk to PostgreSQL.
+    The browser does not directly talk to Gunicorn.
+
+    In our project, the browser talks to Nginx.
+    Inside the browser, after the page loads, React runs.
+    React controls what the user sees: pages, forms, buttons, messages, and frontend navigation.
+
+    The browser has two roles:
+    1. It sends requests to the server.
+    2. It runs the frontend React app after Nginx sends the built files.
+
+    For example:
+    When we open https://localhost/login, the browser asks Nginx for the website.
+    Nginx sends the React app.
+    Then React runs in the browser and shows the login page.
+
+2. NGINX
+    Nginx is the actual web server in our project which means it is the first server-side program that receives the browser's request.
+    server-side: meaning the web server runs on the machine/container serving the website and not inside the browser.
+
+    Client side
+        = runs in the browser
+        = Chrome + React JavaScript after it is loaded
+        React code runs in Chrome.
+
+    Server side
+        = runs outside the browser
+        = Nginx, Gunicorn, Django, PostgreSQL
+        Gunicorn and Django run in the backend Docker container.
+        PostgreSQL runs in the db Docker container.
+        
+    For example:
+    When the browser opens https://localhost/, it is not directly entering Django.
+    It is not directly entering React.
+    It is entering Nginx.
+
+    Nginx has two roles:
+    1. Serve frontend files - For frontend pages, Nginx directly gives files back to the browser.
+        For example:
+            Browser asks for 'https://localhost/', then Nginx responds with,
+                a. index.html
+                b. JavaScript files
+                c. CSS files
+                d. assets
+        So: Browser → NGINX → React static files
+        Nginx is serving as a webserver.
+        Nginx serves the built React files from:
+            /usr/share/nginx/html   -> The path inside the Nginx container
+
+    2. Reverse proxy API requests - Nginx doesn't handle backend logix by itself.
+        For backend API paths:
+            /api/users/signup/
+            /api/users/login/
+            /api/users/me/
+            /api/users/logout/
+        Nginx forwards those requests to the backend (Gunicorn/Django).
+        Nginx is serving as a reverse proxy.
+
+        ** What is a reverse proxy?
+        A reverse proxy is a server that receives a request first, then forwards it to another internal server.
+        The browser does not need to know where the backend container is.
+        The browser only knows https://localhost/api/...
+        Nginx knows that /api/ requests should go to the backend container.
+        Nginx hides the internal structure of the project from the browser.
+
+        For example: The browser only sees,
+            https://localhost/
+            https://localhost/api/users/login/
+        But internally, Nginx knows that,
+            /      → serve React files
+            /api/  → forward to backend:8000
+
+3. React - Our frontend application. It is responsible for what the user sees and interacts with in the browser.
+    React controls:
+        pages
+        forms
+        buttons
+        input fields
+        frontend validation
+        success/error messages
+        navigation between frontend pages
+        API calls using fetch()
+    React does not run as the server in our final setup and runs inside the browser.
+    React code is in frontend/src/.
+    But before the browser can use it, Vite (frontend building tool) builds it into normal static files: HTML, JavaScript, and CSS.
+
+    Nginx sends those files to the browser.
+    Then the browser executes the JavaScript.
+    That JavaScript is the React app.
+
+            Analogy:
+        When we write React code, we write files like:
+        frontend/src/App.jsx
+        frontend/src/pages/LoginPage.jsx
+        frontend/src/pages/SignupPage.jsx
+        frontend/src/utils/cookies.js
+
+            So:
+        React source code is inside frontend/src/.
+        React source code is inside frontend/src/.
+        They are JavaScript syntax that need to be transformed before normal browsers can run directly
+
+
+4. Vite - just simply a frontend building tool.
+    Meaning, a tool that takes our frontend source code, and prepares it for the browser.
+
+    By prepare, it means:
+    1. Handles JSX because browsers dont understand JSX as plain JavaScript syntax. It transforms JSX into normal JavaScript.
+    2. Follows imports from different files across the source files.
+    3. Bundles production files in one output folde which Nginx can serve.
+    4. Production optimization.
+
+    This is because the browser cannot just simply receive the project folder as it is. It needs to be processed, and needs to be optimized.
+
+    ** JavaScript vs JSX (JavaScript XML/Syntax Extension)
+    JavaScript is the programming language that browsers understand and run.
+    JSX is syntax used by React developers to write UI in a more readable way.
+    A Browser cannot directly understand JSX unless it is transformed to JavaScript.
+
+5. Gunicorn - backend Python application server whose job is to run the Django backend. So basically another server.
+    Django is our backend framework, but something has to receive backend HTTP requests and pass them into Django.
+    That something is Gunicorn.
+
+    So two servers with different functions:
+    Nginx
+    = public-facing web server
+    = handles HTTPS
+    = serves static frontend files
+    = decides where requests go
+    = forwards API requests
+
+    Gunicorn
+    = Python application server
+    = runs Django
+    = receives forwarded backend requests from Nginx
+    = passes requests into Django code
+
+6. Django - Our backend framework. Where the backend application logic lives.
+    
+    Django handles:
+    - API endpoints
+    - user signup
+    - user login
+    - current user check
+    - logout
+    - sessions
+    - CSRF protection
+    - database models
+    - database queries
+    - admin/internal Django systems
+
+    When React sends POST /api/users/login/, Django is the part that checks:
+    - Did the request contain email and password?
+    - Does this user exist?
+    - Is the password correct?
+    - Should we create a session?
+    - What JSON response should we send back?
+
+    Django is the only part that should directly talk to PostgreSQL.
+
+    Django models are the blueprint.
+
+    ** What is a 'migration'?
+    A migration is a Django-generated file that describes a database structure change. Whenever there is an update in the database structure, we need to write some python code, but the database doesn't automatically know
+    that there was a change. So we need to make a migration file which is basically Django's recorded instruction file.
+    Django models are Python definitions of what our data should look like.
+    But since PostgreSQL is a separate database program, it does not automatically read our Python classes and create tables by itself.
+    When we run migrate, Django reads those migration files and applies them to PostgreSQL, creating or updating the real database tables.
+
+7. PostgreSQL - Database system
+    Our PostgreSQL data is stored in a Docker volume called postgres_data.
+    This means the database data is not only inside the temporary container filesystem.
+    The volume lets the data survive normal container restarts.
+
+Digram:
+                    ┌──────────────────────┐
+                    │       Browser        │
+                    │  - user opens site   │
+                    │  - runs React app    │
+                    └──────────┬───────────┘
+                               │ HTTPS
+                               ▼
+                    ┌──────────────────────┐
+                    │        Nginx         │
+                    │  web server          │
+                    │  reverse proxy       │
+                    └───────┬────────┬─────┘
+                            │        │
+          frontend routes   │        │ /api/ requests
+     /, /signup, /login     │        │
+                            ▼        ▼
+              ┌────────────────┐   ┌──────────────────────┐
+              │ Built React     │   │      Gunicorn        │
+              │ static files    │   │ Python app server    │
+              │ /usr/share/...  │   └──────────┬───────────┘
+              └────────────────┘              │ WSGI    (Web Server Gateway Interface) standard connection format that lets Gunicorn call a Django application
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │        Django        │
+                                    │ backend logic/API    │
+                                    └──────────┬───────────┘
+                                               │ ORM/database connection
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │      PostgreSQL      │
+                                    │ persistent database  │
+                                    └──────────────────────┘
+
+**Do clean docker buildup**
+
+Code flow order:
+
+
+PROJECT STARTUP / INFRASTRUCTURE
+
+docker-compose.yml
+  ↓
+.env / .env.example
+  ↓
+Build containers
+
+db service
+  └── PostgreSQL + postgres_data volume
+
+backend service
+  ├── backend/Dockerfile
+  ├── backend/requirements.txt
+  ├── backend/config/wsgi.py    role of wsgi.py -> wsgi.py is the file that lets Gunicorn enter/start the Django application. Its job is to expose the Django application to Gunicorn.
+  └── Gunicorn starts Django
+        ↓
+      backend/config/settings.py loaded
+
+frontend service
+  ├── frontend/Dockerfile
+  ├── frontend/package.json
+  └── Vite builds React source into /app/dist
+        ↓
+      builds frontend_dist volume
+
+nginx service
+  ├── nginx/default.conf
+  ├── nginx/certs/localhost.crt
+  └── nginx/certs/localhost.key
+
+
+FRONTEND PAGE REQUEST
+
+Chrome opens /signup
+  ↓
+nginx/default.conf
+  ↓
+location /
+  ↓
+/usr/share/nginx/html
+  ↓
+built React files from frontend_dist
+  ↓
+frontend/src/main.jsx
+  ↓
+frontend/src/App.jsx
+  ↓
+frontend/src/pages/SignupPage.jsx
+
+
+BACKEND API REQUEST
+
+SignupPage.jsx / LoginPage.jsx / HomePage.jsx
+  ↓
+fetch("/api/users/...")
+  ↓
+frontend/src/utils/cookies.js for POST CSRF
+  ↓
+nginx/default.conf
+  ↓
+location /api/
+  ↓
+proxy_pass backend:8000
+  ↓
+Gunicorn
+  ↓
+backend/config/wsgi.py
+  ↓
+Django loads/uses backend/config/settings.py
+  ↓
+backend/config/urls.py
+  ↓
+backend/users/urls.py
+  ↓
+backend/users/views.py
+  ↓
+backend/users/serializers.py if validation/conversion is needed
+  ↓
+backend/users/models.py
+  ↓
+backend/users/migrations/ already applied to database
+  ↓
+PostgreSQL
+
+
+PROJECT MAINTENANCE / TEAMMATE SETUP
+
+.gitignore
+  ↓
+prevents private/generated files from Git
+
+.env.example
+  ↓
+template for local .env
+
+README.md
+  ↓
+fresh clone setup instructions
