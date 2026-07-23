@@ -1,9 +1,10 @@
-5 main Logic Flows
+6 main Logic Flows
 1. Docker startup Flow
-2. Browser opening the website
-3. Reach frontend routing Flow
-4. Signup/login/logout API Flow
-5. Database/session/authentication Flow
+2. Browser opening the website / Nginx Flow
+3. React frontend startup and routing Flow
+4. Frontend authentication request Flow
+5. Django backend API Flow
+6. Database/session/authentication/migration Flow
 
 A. Docker startup Flow
 files:
