@@ -5,8 +5,8 @@ services:
     build: ./backend
     container_name: transcendence_backend
     # Expose backend port to host machine
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     # Load environment variables from .env
     env_file:
       - .env

@@ -1,0 +1,124 @@
+5 main Logic Flows
+1. Docker startup Flow
+2. Browser opening the website
+3. Reach frontend routing Flow
+4. Signup/login/logout API Flow
+5. Database/session/authentication Flow
+
+A. Docker startup Flow
+files:
+- docker-compose.yml
+- backend/Dockerfile
+- frontend/Dockerfile
+- backend/requirements.txt
+- frontend/package.json
+
+Logic order:
+1. docker-compose.yml
+2. db service starts PostgreSQL
+3. backend service builds fron backend/Dockerfile
+4. bakcend installs backend/requirements.txt
+5. frontend service builds from frontend/Dockerfile
+6. frontend installs frontend/package.json
+7. frontend creates productions builds
+8. nginx service starts
+9. nginx receives built React files through Docker volume
+
+B. Browser opens the website
+files:
+- nginx/default.conf
+
+Logic order:
+1. Browser requests https://localhost/login
+2. Nginx receives HTTPS requests
+3. Nginx checks location rules
+4. If request starts with /api/, send to backend
+5. If request is normal frontend route, serve React index.html
+6. Browser downloads React JavaScript/CSS
+
+C. React frontend startup and routing Flow
+files:
+- frontend/src/main.jsx
+- frontend/src/App.jsx
+- frontend/src/pages/LoginPage.jsx
+- frontend/src/pages/SignupPage.jsx
+- frontend/src/pages/HomePage.jsx
+- frontend/src/pages/PrivacyPage.jsx
+- frontend/src/pages/TermsPage.jsx
+
+Logic order:
+1. frontend/src/main.jsx
+2. loads React
+3. mounts the app into the HTML root element
+4. renders App.jsx
+5. App.jsx defines routes
+6. React Router checks current URL
+7. React Router displays the matching page component
+
+D. Frontend authentication request Flow
+files:
+- frontend/src/pages/LoginPage.jsx
+- frontend/src/pages/SignupPage.jsx
+- frontend/src/pages/HomePage.jsx
+- frontend/src/utils/cookies.js
+
+Logic order:
+a. Login
+    1. LoginPage.jsx renders form
+    2. User types email/password
+    3. useState stores input values
+    4. User submits form
+    5. login function runs
+    6. React calls getCookie("csrftoken")
+    7. React sends POST /api/users/login/
+    8. Nginx forwards /api/ request to Django
+    9. Django responds
+    10. React updates UI or navigates to another page
+b. Signup
+    1. SignupPAge.jsx renders form
+    2. User types account information
+    3. useState stores values
+    4. User submits form
+    5. React sends POST /api/users/signup/
+    6. Django creates user
+    7. React receives response
+c. Logout
+    1. User clicks logout
+    2. React sends POST /api/users/logout/
+    3. Django deletes session
+    4. React updates page/auth state
+
+E. Django backend API Flow
+files:
+- backend/config/wsgi.py
+- backend/config/settings.py
+- backend/config/urls.py
+- backend/users/urls.py
+- backend/users/views.py
+- backend/users/serializers.py
+- backend/users/models.py
+
+Logic order:
+1. Nginx sends request to backend:8000
+2. Gunicorn receives request
+3. Gunicorn uses backend/config/wsgi.py
+4. Django loads backend/config/settings.py
+5. Django checks backend/config/urls.py
+6. Request is routed to backend/users/urls.py
+7. Correct view in backend/users/views.py runs
+8. Serializer validates input if needed
+9. Model/database is used if needed
+10. Django returns JSON response
+
+F. Database and migration Flow
+files:
+- backend/users/models.py
+- backend/users/migrations/
+- backend/config/settings.py
+
+Logic order:
+1. backend/users/models.py defines Python model
+2. makemigrations creates migration file
+3. migrate applies migration to PostgreSQL
+4. Django ORM uses that table
+5. signup/logic/me/logout read or write database/session data
