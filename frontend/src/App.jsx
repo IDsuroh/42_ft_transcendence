@@ -132,7 +132,7 @@ import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
 
 // App UI Component
-// App.jsx is not the frontend router/layout file.
+// App.jsx is the frontend router and top-level layout for navigation.
 // It decides which page component appears depending on the browser URL.
 function App()  {
   return (
@@ -176,7 +176,7 @@ function App()  {
 
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="privacy" element={<PrivacyPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -212,10 +212,12 @@ Link
 = React Router link used to move to another frontend page without manually refreshing.
 
 Current frontend routes:
-  /       → redirects to /home
-  /signup → SignupPage
-  /login  → LoginPage
-  /home   → HomePage
+  /        → HomePage
+  /privacy → PrivacyPage
+  /terms   → TermsPage
+  /signup  → SignupPage
+  /login   → LoginPage
+  /home    → HomePage
 
 This does not change Django backend routes.
 This only controls which React page appears in the browser.
