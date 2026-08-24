@@ -1,183 +1,154 @@
-// import useState which lets the page remember/change a value/update the state to show what is going on
-import { useState } from 'react'
-import { getCookie } from '../utils/cookies'
+import { Link } from 'react-router-dom'
+import RecipeCard from '../components/RecipeCard'
+import SectionTitle from '../components/SectionTitle'
+import {
+  getLatestRecipes,
+  getTopRecipes,
+  recipeTypeCategories,
+  themeCategories,
+} from '../data/siteData'
 
-// HomePage UI Component
-// This page is responsible for checking the current logged-in user and logging out.
 function HomePage() {
-    /*
-        message is React-managed frontend state.
+  const topRecipes = getTopRecipes(3)
+  const latestRecipes = getLatestRecipes(4)
+  const featuredRecipe = topRecipes[0]
 
-        It stores the current status message shown on the page:
-        - No request sent yet.
-        - Current user: ...
-        - Logged out successfully.
-        - Not logged in.
-        - Already logged out.
-    */
-    const [message, setMessage] = useState('No request sent yet.')
+  return (
+    <div className="content-frame">
+      <section className="page-hero hero-grid">
+        <div>
+          <p className="eyebrow">Landing page</p>
+          <h1>Recipes that feel collected, not dumped into a list.</h1>
+          <p className="page-hero__lead">
+            Browse the recipes people are opening right now, scan the latest
+            additions, or jump into a themed section like summer, salads, or
+            easy weeknight mains.
+          </p>
+          <div className="page-hero__actions" style={{ marginTop: '24px' }}>
+            <Link className="button button--primary" to={`/recipe/${featuredRecipe.slug}`}>
+              Open today&apos;s favorite
+            </Link>
+            <Link className="button button--ghost" to="/category/top-recipes">
+              Browse top recipes
+            </Link>
+          </div>
+          <div className="hero-stats">
+            <span className="stat-pill">24h popular recipes</span>
+            <span className="stat-pill">Latest additions</span>
+            <span className="stat-pill">Category-led browsing</span>
+          </div>
+        </div>
 
-    // This function asks Django: "Who is the currently logged-in user?"
-    async function checkCurrentUser()   {
-        try {
-            /*
-                This sends a GET request to Django's /me/ endpoint.
+        <article
+          className="feature-card"
+          style={{ '--recipe-accent': featuredRecipe.accent }}
+        >
+          <p className="eyebrow">Most popular over 24h</p>
+          <h3>{featuredRecipe.title}</h3>
+          <p>{featuredRecipe.summary}</p>
+          <div className="card-meta-strip">
+            <span>{featuredRecipe.prepTime}</span>
+            <span>{featuredRecipe.servings}</span>
+            <span>{featuredRecipe.rating.toFixed(1)} rating</span>
+          </div>
+          <div className="feature-card__list">
+            {topRecipes.map((recipe) => (
+              <div key={recipe.slug} className="mini-card">
+                <strong>{recipe.title}</strong>
+                <p>{recipe.summary}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
 
-                GET is used because we are only reading/checking information.
-                We are not creating/changing/deleting anything.
+      <section className="page-section">
+        <SectionTitle
+          eyebrow="Popular now"
+          title="What people keep cooking"
+          description="The homepage lead section can switch time spans later, but the structure already supports high-interest recipe curation."
+          action={
+            <Link className="button button--ghost" to="/results/search?q=top">
+              Search highlights
+            </Link>
+          }
+        />
+        <div className="feature-grid">
+          {topRecipes.map((recipe) => (
+            <RecipeCard key={recipe.slug} recipe={recipe} />
+          ))}
+        </div>
+      </section>
 
-                credentials: 'include' means the browser sends the sessionid cookie if it has one.
-                Django uses that sessionid cookie to recognize the logged-in user.
+      <section className="page-section">
+        <SectionTitle
+          eyebrow="Latest additions"
+          title="Fresh recipes entering the catalogue"
+          description="This section mirrors the document note about recent additions and gives the landing page a second browse path beyond popularity."
+        />
+        <div className="feature-grid">
+          {latestRecipes.map((recipe) => (
+            <RecipeCard key={recipe.slug} recipe={recipe} variant="compact" />
+          ))}
+        </div>
+      </section>
 
-                We do not need X-CSRFToken here because this is a GET request.
-                CSRF protection is mainly needed for unsafe/changing requests like POST.
-            */
-            const response = await fetch('/api/users/me/', {
-                method: 'GET',
-                credentials: 'include',
-            })
+      <section className="page-section">
+        <SectionTitle
+          eyebrow="Themes"
+          title="Browse by mood, season, or pace"
+          description="The document suggested themes like cheap, easy and fast, top recipes, summer, and salads. Those are now visible as first-class navigation targets."
+        />
+        <div className="theme-grid">
+          {themeCategories.map((category) => (
+            <article
+              key={category.slug}
+              className="theme-card"
+              style={{
+                '--recipe-accent':
+                  category.slug === 'summer'
+                    ? '#d7a24d'
+                    : category.slug === 'salads'
+                      ? '#7e9d59'
+                      : '#c36841',
+              }}
+            >
+              <p className="eyebrow">Theme</p>
+              <h3>{category.name}</h3>
+              <p>{category.description}</p>
+              <Link className="text-link" to={`/category/${category.slug}`}>
+                Explore theme
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
 
-            /*
-                Read Django's JSON response and convert it into a JavaScript object so React can use
-                data.username, data.email, or data.detail.
-            */
-            const data = await response.json()
-
-            if (response.ok)    {
-                setMessage(`Current user: ${data.username} (${data.email})`)
-            } else  {
-                /*
-                    When nobody is logged in, Django REST Framework returns:
-                    {"detail": "Authentication credentials were not provided."}
-
-                    That message is technically correct, but not user-friendly.
-                    So we translate it into "Not logged in."
-                */
-                if (data.detail === 'Authentication credentials were not provided.')    {
-                    setMessage('Not logged in.')
-                } else  {
-                    setMessage(data.detail || 'Not logged in.')
-                }
-            }
-        } catch (error) {
-            setMessage('Could not connect to backend.')
-        }
-    }
-
-    // This function asks Django to destroy the current logged-in session.
-    async function logoutUser() {
-        try {
-            const csrfToken = getCookie('csrftoken')    // Find Django's CSRF token cookie and return the value
-
-            /*
-                This sends a POST request to Django's logout endpoint.
-
-                Logout is POST because it changes the authentication/session state.
-                It destroys the current session.
-
-                credentials: 'include' is needed because Django needs the sessionid cookie to know which
-                session should be logged out.
-
-                X-CSRFToken is needed because logout is a POST request.
-
-                We do not need Content-Type: application/json here because logout sends no JSON body.
-            */
-            const response = await fetch('/api/users/logout/', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                },
-            })
-
-            const data = await response.json()
-
-            if (response.ok)    {
-                /*
-                    The backend LogoutView returns:
-                    {"message": "Logged out successfully."}
-
-                    So the frontend reads data.message.
-                */
-                setMessage(data.message || 'Logged out.')
-            } else  {
-                /*
-                    If the user clicks Logout while already logged out, Django returns the authentication
-                    error. We translate that into a nicer frontend message.
-                */
-                if (data.detail === 'Authentication credentials were not provided.')    {
-                    setMessage('Already logged out.')
-                } else  {
-                    setMessage(data.detail || data.message || 'Logout failed.')
-                }
-            }
-        } catch (error) {
-            setMessage('Could not connect to backend.')
-        }
-    }
-
-    return (
-        <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-            <section className="w-full max-w-md rounded-2xl bg-slate-900 p-8 shadow-lg">
-                <h1 className="text-3xl font-bold">Home</h1>
-
-                <p className="mt-4 text-slate-300">
-                    Check your current session or log out.
-                </p>
-
-                <div className="mt-6 space-y-4">
-                    <button
-                        onClick={checkCurrentUser}
-                        className="w-full rounded-lg bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600"
-                    >
-                        Check Current User
-                    </button>
-
-                    <button
-                        onClick={logoutUser}
-                        className="w-full rounded-lg bg-red-600 px-4 py-2 font-semibold hover:bg-red-700"
-                    >
-                        Logout
-                    </button>
-                </div>
-
-                <p className="mt-4 rounded-lg bg-slate-800 p-4 text-sm text-slate-300">
-                    {message}
-                </p>
-            </section>
-        </main>
-    )
+      <section className="page-section">
+        <SectionTitle
+          eyebrow="Categories"
+          title="Structure the archive from the menu down"
+          description="The shared header menu points to recipe types and themes, but the landing page also surfaces them directly for faster scanning."
+        />
+        <div className="theme-grid">
+          {recipeTypeCategories.map((category) => (
+            <article
+              key={category.slug}
+              className="theme-card"
+              style={{ '--recipe-accent': '#8f5a3f' }}
+            >
+              <p className="eyebrow">Recipe type</p>
+              <h3>{category.name}</h3>
+              <p>{category.description}</p>
+              <Link className="text-link" to={`/category/${category.slug}`}>
+                Open category
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
 }
 
 export default HomePage
-
-/*
-HomePage.jsx is a React page/component.
-
-This page contains only the current-user/logout-related frontend logic:
-- message state
-- checkCurrentUser() function
-- logoutUser() function
-- Check Current User button
-- Logout button
-
-The export makes the HomePage function available to other files.
-
-Later, App.jsx will import this page and React Router will show it when the URL is:
-
-/home
-
-This page can use Tailwind classes because Tailwind is loaded globally:
-
-main.jsx imports index.css
-    ↓
-index.css imports Tailwind
-    ↓
-Vite sees Tailwind because vite.config.js has tailwindcss()
-    ↓
-Vite processes the Tailwind classes
-    ↓
-Browser receives real CSS
-    ↓
-HomePage.jsx className values get styled
-*/

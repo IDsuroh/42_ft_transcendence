@@ -1,37 +1,36 @@
-function PrivacyPage()  {
-    return (
-        <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-            <section className="w-full max-w-2xl rounded-2xl bg-slate-900 p-8 shadow-lg">
-                <h1 className="text-3xl font-bold">Privacy Policy</h1>
+import PageHero from '../components/PageHero'
 
-                <div className="mt-6 space-y-4 text-slate-300">
-                    <p>
-                        This project is a student web application created for the 42 Transcendence project.
-                    </p>
+function PrivacyPage() {
+  return (
+    <div className="content-frame">
+      <PageHero
+        eyebrow="Privacy"
+        title="Privacy and account handling."
+        lead="This page is now aligned with the recipe-site direction rather than the old Transcendence setup."
+      />
 
-                    <p>
-                        We collect only the information needed to create and manage user accounts, such as username,
-                        email address, and authentication data.
-                    </p>
+      <section className="page-section split-grid">
+        <article className="detail-panel">
+          <p className="eyebrow">What we store</p>
+          <h3>Account and recipe data</h3>
+          <p>
+            The platform is expected to store account identity details, submitted
+            recipes, moderation notes, favorites, and review activity once the Django
+            and MariaDB layers are connected.
+          </p>
+        </article>
 
-                    <p>
-                        Passwords are not stored in plain text. They are processed by Django&apos;s authentication
-                        system and stored as password hashes.
-                    </p>
-
-                    <p>
-                        Session cookies are used to keep users logged in. CSRF cookies are used to protect unsafe
-                        requests such as login, signup, and logout.
-                    </p>
-
-                    <p>
-                        This application is intended for educational use. Do not enter sensitive personal information
-                        beyond what is necessary for testing the project.
-                    </p>
-                </div>
-            </section>
-        </main>
-    )
+        <article className="detail-panel">
+          <p className="eyebrow">Why it matters</p>
+          <h3>Educational project boundaries</h3>
+          <p>
+            This remains a student project. Sensitive production-grade privacy handling
+            is not assumed yet, and the frontend currently acts as a structured preview.
+          </p>
+        </article>
+      </section>
+    </div>
+  )
 }
 
 export default PrivacyPage

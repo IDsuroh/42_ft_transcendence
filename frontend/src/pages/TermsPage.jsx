@@ -1,38 +1,35 @@
-function TermsPage()    {
-    return (
-        <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-            <section className="w-full max-w-2xl rounded-2xl bg-slate-900 p-8 shadow-lg">
-                <h1 className="text-3xl font-bold">Terms of Service</h1>
+import PageHero from '../components/PageHero'
 
-                <div className="mt-6 space-y-4 text-slate-300">
-                    <p>
-                        This application is a student project created for educational purposes as part of the 
-                        42 Transcendence project.
-                    </p>
+function TermsPage() {
+  return (
+    <div className="content-frame">
+      <PageHero
+        eyebrow="General usage conditions"
+        title="Use the recipe site respectfully while it is still in development."
+        lead="The footer links here because your notes explicitly asked for general usage conditions."
+      />
 
-                    <p>
-                        Users are expected to use the application respectfully and only for legitimate testing and
-                        project-related activity.
-                    </p>
+      <section className="page-section split-grid">
+        <article className="detail-panel">
+          <p className="eyebrow">Platform use</p>
+          <h3>Recipe browsing and submissions</h3>
+          <p>
+            Users are expected to browse, save, and submit recipes in good faith.
+            Admin review tools exist to moderate requests before publication.
+          </p>
+        </article>
 
-                    <p>
-                        Account access is protected through Django authentication, session cookies, and CSRF protection.
-                        Users should not attempt to access another user&apos;s account or interfere with the service.
-                    </p>
-
-                    <p>
-                        The application may change during development. Features, data, and accounts may be reset or
-                        modified as the project evolves.
-                    </p>
-
-                    <p>
-                        By using this project, you understand that it is an educational application and not a production
-                        commercial service.
-                    </p>
-                </div>
-            </section>
-        </main>
-    )
+        <article className="detail-panel">
+          <p className="eyebrow">Development status</p>
+          <h3>Features may reset while the project evolves</h3>
+          <p>
+            Because the project is being rebuilt, account flows, recipe data, and
+            moderation states may change before the final backend is in place.
+          </p>
+        </article>
+      </section>
+    </div>
+  )
 }
 
 export default TermsPage
