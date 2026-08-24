@@ -31,6 +31,142 @@ Use this structure for future entries:
 - Important findings, blockers, or decisions
 ```
 
+## Explanation Protocol
+
+Use this protocol whenever the user asks for a code explanation, logic walkthrough, or architecture explanation in this repository.
+
+- Explain line by line when the user asks for code flow or syntax explanation.
+- Define jargon in simple language before using it heavily.
+- Explain each item in this order:
+  - what it is
+  - why it exists
+  - how it works
+  - how it connects to the next part
+- Do not only narrate behavior. Explain the mechanism.
+- Do not assume the user knows terms like:
+  - WSGI
+  - ASGI
+  - CORS
+  - CSRF
+  - REST framework
+  - class-based view
+  - middleware
+  - proxy
+  - origin
+  - cookie
+  - session
+- When explaining routing, spell out the exact flow:
+  - what URL the browser requested
+  - what Nginx does with that URL
+  - what Django file receives it first
+  - how Django matches the path
+  - why the path may be split across multiple `urls.py` files
+  - which view function or class handles it next
+- When explaining a split routing setup such as `config/urls.py` and `users/urls.py`, explain why the project divides responsibilities instead of placing every route in one file.
+- When explaining syntax like `.as_view()`, explain:
+  - what object exists before `.as_view()`
+  - why Django cannot use the class directly as the final request handler
+  - what `.as_view()` returns
+  - how the returned callable leads Django to `get()` or `post()`
+- Avoid vague phrases like "eventually Django runs ..." unless the call chain has already been explained step by step.
+- Tie backend explanations to the frontend and Nginx when relevant, so the user can see the full request-response path.
+- Prefer concrete examples using the actual paths in this repository, such as `/api/users/login/`.
+- If a configuration file uses values from `.env`, explain exactly how the value is loaded and where that loading happens in code.
+- If the user sounds unfamiliar with the topic, write as if teaching from zero knowledge and reduce jargon aggressively.
+- Do not compress the explanation into a short summary if the user asked for a detailed walkthrough.
+- When explaining code logic in the terminal, lay out the code lines themselves in the explanation, not only file names or line numbers.
+- If the user asks where the frontend sends API calls, include the actual frontend code that performs the request and explain it step by step.
+- When a multi-chunk explanation is in progress, save the chunk breakdown in the work log if the user wants to continue later.
+- Unless the user explicitly says otherwise, explain code logic as if the user has no background knowledge at all, including basic syntax and foundational programming concepts.
+
+## 2026-07-29
+
+### Task
+- Save the user's explanation protocol into the repository work log for future sessions
+
+### Actions
+- Reviewed the existing work log file in the project root
+- Added a dedicated `Explanation Protocol` section with the user's preferred explanation rules
+- Recorded this update as a dated work log entry
+
+### Notes
+- The repository uses `WORK_LOG.md` as the existing persistent notes file
+- Future explanation requests in this repo should follow the protocol above unless the user asks for a different style
+
+## 2026-07-29
+
+### Task
+- Save the Step F chunk breakdown so the explanation can resume later
+
+### Actions
+- Recorded the planned Step F teaching chunks for the database, migration, session, and authentication flow
+
+### Notes
+- Step F chunk plan:
+  - Chunk 1: `models.py`
+    - what a model is
+    - what `class User(AbstractUser):` means
+    - what fields mean
+    - how Python model code represents database structure
+  - Chunk 2: migrations
+    - what a migration is
+    - what `makemigrations` does
+    - what `migrate` does
+    - how model code becomes a real PostgreSQL table
+  - Chunk 3: database connection
+    - how `settings.py` connects Django to PostgreSQL
+    - what each `DATABASES` value means
+    - how Django knows which database to use
+  - Chunk 4: signup to database write
+    - how signup reaches `create_user(...)`
+    - what gets saved into the database
+    - why password is hashed instead of stored raw
+  - Chunk 5: login to session/auth state
+    - how login checks stored user data
+    - what `authenticate(...)` compares
+    - what `login(request, user)` stores for future requests
+  - Chunk 6: `/me/` and session reuse
+    - how Django reads the session on later requests
+    - how `request.user` is reconstructed from stored session/auth data
+  - Chunk 7: logout and session destruction
+    - what gets invalidated
+    - why the old session no longer works
+  - Chunk 8: full Step F connection map
+    - model -> migration -> database table -> signup -> login -> session -> me -> logout
+
+## 2026-07-30
+
+### Task
+- Record the repo-level collaboration rule for future edits
+
+### Actions
+- Added a standing note that real file changes should be proposed and explained first
+
+### Notes
+- Before making any real file changes in this repo:
+  - explain the proposed changes first
+  - explain why those changes are being made
+  - wait for explicit user approval before applying them
+- Future changes and recommendations for this repo should be checked against
+  `ft_transcendence.pdf` for compliance before implementation.
+- The current Docker/HTTPS/bootstrap approach is for development only.
+- Later, when preparing the final production deployment version, use a clear
+  dev vs production split:
+  - production should use real CA-issued certificates
+  - production should use separate production settings/environment handling
+  - production should use tighter secret handling
+  - production should include backups, logging, restart policy, and monitoring
+  - production should not reuse the self-signed localhost certificate flow
+  - production should not keep `DEBUG=True`
+  - production should not expose dev-only bind mounts
+  - production should not commit private keys
+- When `README.md` is next updated, add a clear note that the current setup is
+  for development only and is not the final production deployment approach.
+- Planned work order for the next major phases:
+  - finish and clean the local/development setup first
+  - then make the app more Kanban-focused
+  - then prepare the deployable/production version
+
 ## 2026-07-24
 
 ### Task
@@ -75,3 +211,31 @@ Use this structure for future entries:
 - `frontend/src/App.jsx` wraps the app in `BrowserRouter`, renders the navigation links, and maps URL paths to page components
 - The page files are the route targets that React Router displays after matching the browser URL
 - `LoginPage.jsx`, `SignupPage.jsx`, and `HomePage.jsx` also contain request logic, so they belong partly to step D as well
+
+## 2026-08-24
+
+### Task
+- Split the repository workflow so frontend work can continue on a dedicated branch
+
+### Actions
+- Recorded the decision to stop pursuing the earlier Kanban-heavy scope for now
+- Recorded that the next active focus is the website frontend and overall display work
+- Prepared a dedicated `frontend` branch setup that removes backend and infrastructure files from the working branch view while keeping `WORK_LOG.md`
+
+### Notes
+- Current working agreement:
+  - the active implementation focus is the frontend only
+  - Docker infrastructure, backend, and database design are out of scope for the current branch
+- Files intended to stay available on the `frontend` branch:
+  - `frontend/`
+  - `.env`
+  - `ft_transcendence.pdf`
+  - `WORK_LOG.md`
+- Files intended to be removed from the `frontend` branch:
+  - `backend/`
+  - `nginx/`
+  - `.env.example`
+  - `.gitignore`
+  - `docker-compose.yml`
+  - markdown documentation files except `WORK_LOG.md`
+  - loose text notes such as `Some backend commands.txt`
