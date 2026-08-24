@@ -322,6 +322,7 @@ Use this protocol whenever the user asks for a code explanation, logic walkthrou
 ### Notes
 - Current frontend-first work order:
   - preview the site locally and review the design first
+  - prepare a short guide for teammates so they can run `npm run dev` and check the layout/design for confirmation
   - check the main flows one by one:
     - landing page
     - category page
