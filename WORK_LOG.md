@@ -239,3 +239,153 @@ Use this protocol whenever the user asks for a code explanation, logic walkthrou
   - `docker-compose.yml`
   - markdown documentation files except `WORK_LOG.md`
   - loose text notes such as `Some backend commands.txt`
+
+## 2026-08-24
+
+### Task
+- Record the revised project stack and rebuild direction for the restarted implementation
+
+### Actions
+- Recorded that the project is being redone and will need a new frontend container
+- Recorded the agreed technology choices for the restarted build:
+  - Django for the backend framework
+  - React for the frontend application
+  - MariaDB for the database
+- Recorded that snowflake-style table relationship planning has been raised as a database design topic to evaluate later
+
+### Notes
+- The old repository snapshot and the new project direction are not the same thing
+- The current active branch focus is still frontend implementation and overall website display work
+- Frontend container work should be treated as a rebuild, not as a small patch on top of the previous setup
+- Database schema design is not finalized yet; `snowflake schema` is currently a planning note, not an implemented decision in this branch
+
+## 2026-08-24
+
+### Task
+- Rebuild the frontend container for the restarted frontend-first branch
+
+### Actions
+- Replaced the old frontend image definition with a clean development-focused Dockerfile
+- Switched dependency installation in the frontend image to `npm ci` so the lockfile drives the container install
+- Kept the container entrypoint focused on the Vite development server on port `5173`
+- Added `frontend/.dockerignore` to keep local build output, editor files, and dependency folders out of the Docker build context
+
+### Notes
+- This container is now a frontend development container, not a production static-build image
+- The container rebuild is intentionally isolated from backend, reverse proxy, and database orchestration
+
+## 2026-08-24
+
+### Task
+- Read the recipe-site planning document and rebuild the React frontend structure around it
+
+### Actions
+- Read `Recipe Website.txt` from `/home/suroh/Downloads` to capture the current product direction
+- Confirmed the project has pivoted to a recipe website with shared header/footer and these main page types:
+  - landing page
+  - category page
+  - recipe page
+  - add recipe page
+  - profile page
+  - admin page
+  - login and signup flows
+  - search results page
+- Replaced the previous auth-demo router with a recipe-site route map
+- Added shared frontend building blocks:
+  - site header with menu/search/connect/profile actions
+  - site footer with general usage and category links
+  - reusable recipe cards and section headings
+- Added frontend mock content for categories, recipes, profile preview data, and admin review requests
+- Rebuilt the page layer to match the planning document:
+  - landing page with popular/latest/theme sections
+  - category pages with top/latest/all groupings
+  - recipe detail pages with rating anchor, gallery slots, ingredients, steps, author, suggestions, and comments
+  - add recipe page with repeatable frontend form fields
+  - profile page with recipes, favorites, and pending review state
+  - admin dashboard and review-detail pages for pending recipe moderation
+  - login/signup pages restyled for the new product direction
+- Replaced the old demo CSS with a new global visual system for the recipe-site branch
+
+### Notes
+- The current frontend is intentionally backend-independent and uses mock data until Django and MariaDB endpoints are rebuilt
+- Auth forms, recipe submission, favorites, and moderation actions are UI-ready but still use placeholder status handling
+- This environment does not provide `node`, `npm`, or `docker`, so the rebuilt frontend could not be compiled or previewed here
+
+## 2026-08-24
+
+### Task
+- Save the agreed frontend-only work order for future turns
+
+### Actions
+- Recorded the current recommended frontend workflow so later check-ins can continue from the same order
+
+### Notes
+- Current frontend-first work order:
+  - preview the site locally and review the design first
+  - check the main flows one by one:
+    - landing page
+    - category page
+    - recipe page
+    - add recipe page
+    - profile page
+    - admin and review pages
+    - login and signup pages
+  - write down exact frontend corrections after preview:
+    - colors
+    - typography
+    - spacing
+    - card layout
+    - header and menu behavior
+    - mobile layout
+    - missing or weak sections
+  - keep improving only frontend structure:
+    - reusable UI pieces
+    - responsiveness
+    - forms
+    - empty states
+    - mock content quality
+  - do not define real API integration until backend behavior is confirmed
+  - later replace mock data gradually when Django and database output is confirmed
+
+## 2026-08-24
+
+### Task
+- Wrap up the current frontend-only work session with a clear summary for continuation tomorrow
+
+### Actions
+- Confirmed the active branch remains `frontend`
+- Rebuilt the frontend as a recipe-site UI rather than the previous project direction
+- Rebuilt the frontend container as a dedicated development container
+- Replaced the old starter-style frontend pages with recipe-site pages and routes:
+  - landing page
+  - category page
+  - recipe page
+  - add recipe page
+  - profile page
+  - admin dashboard and review page
+  - login and signup pages
+  - connect page
+  - search results page
+  - privacy and terms pages
+- Added shared frontend components for cleaner structure:
+  - site header
+  - site footer
+  - recipe card
+  - section title
+  - page hero
+  - auth page shell
+- Centralized the current placeholder content in `frontend/src/data/siteData.js`
+- Removed leftover starter/demo files that were no longer used:
+  - old Vite starter assets
+  - old cookie helper
+  - old icon sprite
+- Updated the frontend title and favicon so the branch reflects the recipe-site branding
+- Confirmed the site runs in local development after `npm ci`, `npm audit fix`, and `npm run dev`
+- Confirmed the frontend-only workflow going forward:
+  - keep using mock data for UI work
+  - keep avoiding API/backend assumptions until the backend contract is known
+
+### Notes
+- `npm audit fix` changed the lockfile, not the declared dependency list in `package.json`
+- The built output folder `frontend/dist/` and local `frontend/node_modules/` are development artifacts from local npm commands and are not part of the intended source history
+- The current frontend is a structural and visual prototype with placeholder data, ready for more pure frontend refinement before backend integration
