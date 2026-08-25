@@ -1,7 +1,7 @@
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import RecipeCard from '../components/RecipeCard'
 import SectionTitle from '../components/SectionTitle'
-import { searchRecipes, themeCategories } from '../data/siteData'
+import { searchRecipes } from '../data/siteData'
 
 function SearchResultsPage() {
   const [searchParams] = useSearchParams()
@@ -14,23 +14,16 @@ function SearchResultsPage() {
         <p className="eyebrow">Results / search</p>
         <h1>{query ? `Results for "${query}"` : 'Search all recipes'}</h1>
         <p className="page-hero__lead">
-          The shared header search bar lands here. Right now it filters the mock
-          recipe catalogue, and later it can connect directly to Django search endpoints.
+          The shared header search bar lands here. Results will appear once
+          search is connected to live backend data.
         </p>
-        <div className="pill-list" style={{ marginTop: '24px' }}>
-          {themeCategories.map((theme) => (
-            <Link key={theme.slug} className="tag" to={`/category/${theme.slug}`}>
-              {theme.name}
-            </Link>
-          ))}
-        </div>
       </section>
 
       <section className="page-section">
         <SectionTitle
           eyebrow="Matches"
           title={`${results.length} result${results.length === 1 ? '' : 's'} found`}
-          description="This page is intentionally lightweight so search can remain a focused browse layer."
+          description="This section should render the database matches for the current query."
         />
         {results.length > 0 ? (
           <div className="results-grid">
@@ -39,10 +32,7 @@ function SearchResultsPage() {
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            No recipes matched that search yet. Try a category like summer, soups,
-            or top recipes.
-          </div>
+          <div className="empty-state">No recipes matched the current query.</div>
         )}
       </section>
     </div>

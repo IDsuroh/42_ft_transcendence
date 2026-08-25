@@ -3,7 +3,6 @@ import RecipeCard from '../components/RecipeCard'
 import SectionTitle from '../components/SectionTitle'
 import {
   formatDate,
-  getCategoryLabel,
   getRecipeBySlug,
   getSuggestedRecipes,
 } from '../data/siteData'
@@ -17,10 +16,9 @@ function RecipePage() {
       <div className="content-frame">
         <section className="page-hero not-found">
           <p className="eyebrow">Recipe page</p>
-          <h1>That recipe preview is missing.</h1>
+          <h1>That recipe could not be found.</h1>
           <p className="page-hero__lead">
-            The route is correct, but the mock recipe data does not contain this
-            slug yet.
+            There is no live recipe data connected for this URL yet.
           </p>
         </section>
       </div>
@@ -35,21 +33,12 @@ function RecipePage() {
         <p className="eyebrow">Recipe page</p>
         <h1>{recipe.title}</h1>
         <p className="page-hero__lead">{recipe.summary}</p>
-        <div className="hero-stats">
-          <a className="stat-pill" href="#comments">
-            {recipe.rating.toFixed(1)} rating and {recipe.reviewCount} reviews
-          </a>
-          <span className="stat-pill">{recipe.prepTime}</span>
-          <span className="stat-pill">{recipe.difficulty}</span>
-          <span className="stat-pill">{recipe.servings}</span>
-          <span className="stat-pill">{formatDate(recipe.addedOn)}</span>
-        </div>
         <div className="recipe-detail__actions" style={{ marginTop: '24px' }}>
           <button type="button" className="button button--primary">
             Share recipe
           </button>
           <button type="button" className="button button--ghost">
-            Add to favorites
+            Save recipe
           </button>
         </div>
       </section>
@@ -57,8 +46,8 @@ function RecipePage() {
       <section className="page-section">
         <SectionTitle
           eyebrow="Picture carousel"
-          title="Visual slots for the recipe gallery"
-          description="There are no final food images yet, so the page uses stylized gallery panels that map cleanly to the future carousel requirement."
+          title="Recipe image slots"
+          description="Each panel below represents an image record that should come from the database or media storage."
         />
         <div className="gallery-grid">
           {recipe.gallery.map((item) => (
@@ -80,7 +69,7 @@ function RecipePage() {
       <section className="page-section detail-grid">
         <article className="detail-panel">
           <p className="eyebrow">Ingredients</p>
-          <h3>Build the plate</h3>
+          <h3>Ingredient records</h3>
           <ul className="ingredient-list">
             {recipe.ingredients.map((ingredient) => (
               <li key={ingredient}>{ingredient}</li>
@@ -90,7 +79,7 @@ function RecipePage() {
 
         <article className="detail-panel">
           <p className="eyebrow">Steps</p>
-          <h3>Cook in order</h3>
+          <h3>Step records</h3>
           <ol className="step-list">
             {recipe.steps.map((step) => (
               <li key={step}>{step}</li>
@@ -101,25 +90,18 @@ function RecipePage() {
 
       <section className="page-section split-grid">
         <article className="detail-panel">
-          <p className="eyebrow">Author</p>
+          <p className="eyebrow">Record metadata</p>
           <h3>{recipe.author}</h3>
           <p>{recipe.authorNote}</p>
-          <div className="pill-list" style={{ marginTop: '18px' }}>
-            <span className="tag">{getCategoryLabel(recipe.type)}</span>
-            {recipe.themes.map((theme) => (
-              <span key={theme} className="tag">
-                {getCategoryLabel(theme)}
-              </span>
-            ))}
-          </div>
+          <p>{`Created or published date: ${formatDate(recipe.addedOn)}`}</p>
         </article>
 
         <article className="detail-panel">
           <p className="eyebrow">Suggestions</p>
-          <h3>Keep browsing nearby flavors</h3>
+          <h3>Suggested recipe records</h3>
           <p>
-            The document asked for suggestions between the steps and comments.
-            This placement follows that structure.
+            Later this block can use related-category, tag, or ranking logic from
+            the backend.
           </p>
           <div className="feature-card__list" style={{ marginTop: '18px' }}>
             {suggestions.map((suggestedRecipe) => (
@@ -135,8 +117,8 @@ function RecipePage() {
       <section className="page-section">
         <SectionTitle
           eyebrow="Comments"
-          title="Reader feedback and notes"
-          description="The rating display above links down here, which matches the page requirement in your planning document."
+          title="Comment records"
+          description="This section should render stored public comments if recipe comments are enabled."
         />
         <div id="comments" className="feature-grid">
           {recipe.comments.map((comment) => (
@@ -154,8 +136,8 @@ function RecipePage() {
       <section className="page-section">
         <SectionTitle
           eyebrow="More like this"
-          title="Suggested recipes in card form"
-          description="The same recipe-card component used on the landing page also powers the suggestion section to keep the UI system consistent."
+          title="Suggested recipe cards"
+          description="This repeats the suggestion records in the shared card component."
         />
         <div className="feature-grid">
           {suggestions.map((suggestedRecipe) => (

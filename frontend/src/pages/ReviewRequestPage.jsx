@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   formatDate,
-  getCategoryLabel,
   getPendingRecipeBySlug,
 } from '../data/siteData'
 
@@ -10,9 +9,7 @@ function ReviewRequestPage() {
   const { slug } = useParams()
   const request = getPendingRecipeBySlug(slug)
   const [moderatorReply, setModeratorReply] = useState('')
-  const [status, setStatus] = useState(
-    'This review screen is ready for moderator notes. Approval and denial actions are still frontend placeholders.',
-  )
+  const [status, setStatus] = useState('No moderation action has been taken yet.')
 
   if (!request) {
     return (
@@ -29,9 +26,7 @@ function ReviewRequestPage() {
   }
 
   function handleModeration(action) {
-    setStatus(
-      `${action} recorded in the frontend preview. The reply box value is preserved so Django moderation endpoints can consume it later.`,
-    )
+    setStatus(`${action} was recorded in the UI only. Backend moderation is not connected yet.`)
   }
 
   return (
@@ -43,18 +38,13 @@ function ReviewRequestPage() {
         <div className="hero-stats">
           <span className="stat-pill">{request.author}</span>
           <span className="stat-pill">{formatDate(request.submittedOn)}</span>
-          {request.categories.map((category) => (
-            <span key={category} className="stat-pill">
-              {getCategoryLabel(category)}
-            </span>
-          ))}
         </div>
       </section>
 
       <section className="page-section review-request__grid">
         <article className="review-card">
           <p className="eyebrow">Ingredients</p>
-          <h3>Submission ingredients</h3>
+          <h3>Submitted ingredient records</h3>
           <ul className="ingredient-list">
             {request.ingredients.map((ingredient) => (
               <li key={ingredient}>{ingredient}</li>
@@ -64,7 +54,7 @@ function ReviewRequestPage() {
 
         <article className="review-card">
           <p className="eyebrow">Steps</p>
-          <h3>Submission steps</h3>
+          <h3>Submitted step records</h3>
           <ol className="step-list">
             {request.steps.map((step) => (
               <li key={step}>{step}</li>
@@ -76,7 +66,7 @@ function ReviewRequestPage() {
       <section className="page-section moderation-grid">
         <article className="review-card">
           <p className="eyebrow">Moderator reply</p>
-          <h3>Comment box for approval or denial</h3>
+          <h3>Moderator reply field</h3>
           <div className="field" style={{ marginTop: '18px' }}>
             <label htmlFor="moderator-reply">Reply to user</label>
             <textarea
@@ -84,7 +74,7 @@ function ReviewRequestPage() {
               rows="7"
               value={moderatorReply}
               onChange={(event) => setModeratorReply(event.target.value)}
-              placeholder="Write the note that would be sent back if the recipe is denied or needs changes."
+              placeholder="Write a reply to the user"
             />
           </div>
           <div className="review-request__actions" style={{ marginTop: '18px' }}>
@@ -93,21 +83,21 @@ function ReviewRequestPage() {
               className="button button--primary"
               onClick={() => handleModeration('Approval')}
             >
-              Approve recipe
+              Approve
             </button>
             <button
               type="button"
               className="button button--secondary"
               onClick={() => handleModeration('Denial')}
             >
-              Deny with note
+              Deny
             </button>
           </div>
         </article>
 
         <article className="review-card">
           <p className="eyebrow">Current state</p>
-          <h3>Frontend moderation status</h3>
+          <h3>Moderation status message</h3>
           <p className="status-banner" style={{ marginTop: '18px' }}>
             {status}
           </p>

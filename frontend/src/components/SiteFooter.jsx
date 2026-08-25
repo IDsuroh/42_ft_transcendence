@@ -1,38 +1,33 @@
 import { Link } from 'react-router-dom'
-import { recipeTypeCategories } from '../data/siteData'
 
 function SiteFooter() {
   return (
     <footer className="site-footer">
-      <div className="content-frame site-footer__grid">
-        <section>
-          <p className="eyebrow">Recipe Site</p>
-          <h3>Built to browse recipes first, wire the backend second.</h3>
-          <p className="site-footer__copy">
-            This branch focuses on frontend structure, navigation, and display.
-            Django, MariaDB, and moderation flows will connect behind it later.
-          </p>
-        </section>
-
-        <section>
-          <p className="eyebrow">General use</p>
-          <div className="footer-link-list">
-            <Link to="/terms">General usage conditions</Link>
-            <Link to="/privacy">Privacy and account handling</Link>
-            <Link to="/connect">Connect</Link>
+      <div className="content-frame site-footer__inner">
+        <section className="site-footer__panel site-footer__brand">
+          <div className="site-footer__mark" aria-hidden="true">
+            RS
+          </div>
+          <div className="site-footer__brand-copy">
+            <p className="eyebrow">Recipe Site</p>
+            <h3>Site footer</h3>
+            <p className="site-footer__copy">
+              Shared site links and account entry points live here.
+            </p>
           </div>
         </section>
 
-        <section>
-          <p className="eyebrow">Categories</p>
-          <div className="footer-link-list">
-            {recipeTypeCategories.map((category) => (
-              <Link key={category.slug} to={`/category/${category.slug}`}>
-                {category.name}
-              </Link>
-            ))}
-          </div>
-        </section>
+        <nav className="site-footer__links" aria-label="Footer links">
+          <Link className="footer-link" to="/terms">
+            Terms
+          </Link>
+          <Link className="footer-link" to="/privacy">
+            Privacy
+          </Link>
+          <Link className="footer-link" to="/connect">
+            Connect
+          </Link>
+        </nav>
       </div>
     </footer>
   )

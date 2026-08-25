@@ -1,33 +1,14 @@
 import { useState } from 'react'
-import {
-  recipeTypeCategories,
-  themeCategories,
-} from '../data/siteData'
-
-const ingredientChoices = [
-  'Tomatoes',
-  'Chicken thighs',
-  'Rice',
-  'Limes',
-  'Basil',
-  'Peaches',
-  'Yogurt',
-  'Chickpeas',
-]
 
 function AddRecipePage() {
   const [recipeName, setRecipeName] = useState('')
-  const [ingredients, setIngredients] = useState([
-    { ingredient: ingredientChoices[0], quantity: '' },
-  ])
-  const [categories, setCategories] = useState([recipeTypeCategories[0].slug])
+  const [ingredients, setIngredients] = useState([{ ingredient: '', quantity: '' }])
+  const [categories, setCategories] = useState([''])
   const [steps, setSteps] = useState([''])
   const [pictures, setPictures] = useState([''])
   const [status, setStatus] = useState(
-    'This form is a frontend-first recipe proposal builder. Submission logic will be added when the moderation backend exists.',
+    'Form submission is available here, but it is not connected to the backend yet.',
   )
-
-  const categoryOptions = [...recipeTypeCategories, ...themeCategories]
 
   function updateIngredient(index, field, value) {
     setIngredients((current) =>
@@ -63,19 +44,17 @@ function AddRecipePage() {
       return
     }
 
-    setStatus(
-      'The frontend proposal form is structured and interactive. The next step is wiring its payload to Django review endpoints.',
-    )
+    setStatus('Submission was captured in the UI only. Backend persistence is not connected yet.')
   }
 
   return (
     <div className="content-frame">
       <section className="page-hero">
         <p className="eyebrow">Add recipe page</p>
-        <h1>Build a recipe submission without waiting on the backend.</h1>
+        <h1>Recipe submission form</h1>
         <p className="page-hero__lead">
-          The form structure follows your notes: recipe name, ingredient selectors,
-          categories, repeatable steps, and picture slots.
+          This page keeps the submission structure in place while backend storage
+          and moderation endpoints are being connected.
         </p>
       </section>
 
@@ -92,7 +71,7 @@ function AddRecipePage() {
                   type="text"
                   value={recipeName}
                   onChange={(event) => setRecipeName(event.target.value)}
-                  placeholder="Example: Charred Corn Galette"
+                  placeholder="Recipe title from user input"
                 />
               </div>
 
@@ -101,16 +80,12 @@ function AddRecipePage() {
                 <div className="dynamic-list">
                   {categories.map((category, index) => (
                     <div key={`${category}-${index}`} className="dynamic-card">
-                      <select
+                      <input
+                        type="text"
                         value={category}
                         onChange={(event) => updateCategory(index, event.target.value)}
-                      >
-                        {categoryOptions.map((option) => (
-                          <option key={option.slug} value={option.slug}>
-                            {option.name}
-                          </option>
-                        ))}
-                      </select>
+                        placeholder="Category or theme"
+                      />
                     </div>
                   ))}
                 </div>
@@ -119,35 +94,29 @@ function AddRecipePage() {
               <button
                 type="button"
                 className="button button--ghost"
-                onClick={() =>
-                  setCategories((current) => [...current, themeCategories[0].slug])
-                }
+                onClick={() => setCategories((current) => [...current, ''])}
               >
-                Add more categories
+                Add category field
               </button>
             </div>
           </article>
 
           <article className="form-panel">
             <p className="eyebrow">Ingredients</p>
-            <h3>Repeatable ingredient rows</h3>
+            <h3>Repeatable ingredient fields</h3>
             <div className="dynamic-list" style={{ marginTop: '18px' }}>
               {ingredients.map((item, index) => (
                 <div key={`${item.ingredient}-${index}`} className="dynamic-card field-list">
                   <div className="field">
                     <label>Ingredient</label>
-                    <select
+                    <input
+                      type="text"
                       value={item.ingredient}
                       onChange={(event) =>
                         updateIngredient(index, 'ingredient', event.target.value)
                       }
-                    >
-                      {ingredientChoices.map((choice) => (
-                        <option key={choice} value={choice}>
-                          {choice}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Ingredient name"
+                    />
                   </div>
 
                   <div className="field">
@@ -158,7 +127,7 @@ function AddRecipePage() {
                       onChange={(event) =>
                         updateIngredient(index, 'quantity', event.target.value)
                       }
-                      placeholder="Example: 180 g"
+                      placeholder="Quantity and unit from user input"
                     />
                   </div>
                 </div>
@@ -172,18 +141,18 @@ function AddRecipePage() {
                 onClick={() =>
                   setIngredients((current) => [
                     ...current,
-                    { ingredient: ingredientChoices[0], quantity: '' },
+                    { ingredient: '', quantity: '' },
                   ])
                 }
               >
-                Add more ingredients
+                Add ingredient field
               </button>
             </div>
           </article>
 
           <article className="form-panel">
             <p className="eyebrow">Steps</p>
-            <h3>Structured cooking instructions</h3>
+            <h3>Repeatable step fields</h3>
             <div className="dynamic-list" style={{ marginTop: '18px' }}>
               {steps.map((step, index) => (
                 <div key={`step-${index + 1}`} className="dynamic-card field-list">
@@ -193,7 +162,7 @@ function AddRecipePage() {
                       rows="4"
                       value={step}
                       onChange={(event) => updateStep(index, event.target.value)}
-                      placeholder="Describe the action for this step."
+                      placeholder="Step text from user input"
                     />
                   </div>
                 </div>
@@ -206,14 +175,14 @@ function AddRecipePage() {
                 className="button button--ghost"
                 onClick={() => setSteps((current) => [...current, ''])}
               >
-                Add more steps
+                Add step field
               </button>
             </div>
           </article>
 
           <article className="form-panel">
             <p className="eyebrow">Pictures</p>
-            <h3>Placeholder upload slots</h3>
+            <h3>Image reference fields</h3>
             <div className="dynamic-list" style={{ marginTop: '18px' }}>
               {pictures.map((picture, index) => (
                 <div key={`picture-${index + 1}`} className="dynamic-card field-list">
@@ -223,7 +192,7 @@ function AddRecipePage() {
                       type="text"
                       value={picture}
                       onChange={(event) => updatePicture(index, event.target.value)}
-                      placeholder="Future file path or upload reference"
+                      placeholder="Stored file reference or upload result"
                     />
                   </div>
                 </div>
@@ -236,18 +205,18 @@ function AddRecipePage() {
                 className="button button--ghost"
                 onClick={() => setPictures((current) => [...current, ''])}
               >
-                Add pictures
+                Add image field
               </button>
             </div>
           </article>
 
           <article className="form-panel" style={{ gridColumn: '1 / -1' }}>
             <p className="eyebrow">Submission state</p>
-            <h3>Ready for backend hookup</h3>
+            <h3>Submission status</h3>
             <p className="status-banner">{status}</p>
             <div style={{ marginTop: '18px' }}>
               <button type="submit" className="button button--primary">
-                Save proposal layout
+                Submit recipe
               </button>
             </div>
           </article>

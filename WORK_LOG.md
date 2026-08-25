@@ -385,8 +385,39 @@ Use this protocol whenever the user asks for a code explanation, logic walkthrou
 - Confirmed the frontend-only workflow going forward:
   - keep using mock data for UI work
   - keep avoiding API/backend assumptions until the backend contract is known
+- Compared `frontend_css` against `frontend`, then moved local `frontend` to the same commit and switched back to `frontend` so continued work stays on the user branch without changing the partner branch
 
 ### Notes
 - `npm audit fix` changed the lockfile, not the declared dependency list in `package.json`
 - The built output folder `frontend/dist/` and local `frontend/node_modules/` are development artifacts from local npm commands and are not part of the intended source history
 - The current frontend is a structural and visual prototype with placeholder data, ready for more pure frontend refinement before backend integration
+
+## 2026-08-25
+
+### Task
+- Refine the frontend header menu behavior, remove remaining mock category/data behavior, and save a teammate-facing summary of today's work
+
+### Actions
+- Fixed the header menu popup so it opens as a compact box anchored to the menu button instead of stretching across the page
+- Updated the menu popup sizing so its height follows the real content and no longer cuts off lower menu items
+- Reduced the popup width and kept it viewport-safe for smaller screens
+- Removed the dedicated mock category page flow by deleting `frontend/src/pages/CategoryPage.jsx`
+- Changed `/category/:slug` handling in `frontend/src/App.jsx` to redirect back to `/` instead of rendering a mock category page
+- Removed clickable mock category and theme links from the menu and kept them as non-clickable labels until real backend-driven navigation exists
+- Removed the global mock-data banner that was displayed across the site chrome
+- Cleared the hard-coded mock recipe, profile, and moderation record data from `frontend/src/data/siteData.js`
+- Converted the affected pages to empty-state or backend-pending behavior instead of showing fake records:
+  - `frontend/src/pages/HomePage.jsx`
+  - `frontend/src/pages/SearchResultsPage.jsx`
+  - `frontend/src/pages/ProfilePage.jsx`
+  - `frontend/src/pages/AdminPage.jsx`
+  - `frontend/src/pages/ReviewRequestPage.jsx`
+  - `frontend/src/pages/RecipePage.jsx`
+- Updated `frontend/src/pages/AddRecipePage.jsx` so category and ingredient inputs no longer depend on fake database-driven select options
+- Cleaned up several remaining placeholder labels in the shared UI text, including footer and recipe action labels
+- Prepared a teammate-report summary in Google-doc-friendly bullet format for today's work
+
+### Notes
+- The frontend now behaves more honestly as a structural shell: category routes no longer pretend real category pages exist, and the shared data file no longer injects fake recipe/profile/admin records
+- Runtime verification could not be completed in this shell because `node` and `npm` are unavailable here, so today's checks were limited to source inspection
+- Remaining `placeholder="..."` attributes in form fields are standard input placeholder text, not mock content records
