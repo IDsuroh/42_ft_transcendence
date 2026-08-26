@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { viewer } from '../data/siteData'
 
@@ -17,11 +17,14 @@ const menuThemeLabels = [
   'Top Recipes',
 ]
 
+function handleMenuPlaceholderClick() {}
+
 function SiteHeader() {
   const location = useLocation()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const menuPopoverRef = useRef(null)
 
   useEffect(() => {
     setMenuOpen(false)
@@ -31,6 +34,26 @@ function SiteHeader() {
       setQuery(params.get('q') ?? '')
     }
   }, [location.pathname, location.search])
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return undefined
+    }
+
+    function handlePointerDown(event) {
+      if (menuPopoverRef.current?.contains(event.target)) {
+        return
+      }
+
+      setMenuOpen(false)
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [menuOpen])
 
   function handleSearchSubmit(event) {
     event.preventDefault()
@@ -48,7 +71,7 @@ function SiteHeader() {
   return (
     <header className="site-header">
       <div className="site-header__inner content-frame">
-        <div className="menu-popover">
+        <div ref={menuPopoverRef} className="menu-popover">
           <button
             type="button"
             className="menu-button"
@@ -69,20 +92,26 @@ function SiteHeader() {
             className={menuOpen ? 'menu-panel is-open' : 'menu-panel'}
           >
             <div className="menu-panel__stack">
-              <Link
-                to={viewer.isAuthenticated ? '/add-recipe' : '/connect'}
+              <button
+                type="button"
                 className="menu-line"
+                onClick={handleMenuPlaceholderClick}
               >
                 Propose a recipe <span className="menu-line__hint">(needs login)</span>
-              </Link>
+              </button>
 
               <section className="menu-group">
                 <p className="menu-group__title">Recipes by Type</p>
                 <div className="menu-link-list">
                   {menuRecipeTypeLabels.map((label) => (
-                    <span key={label} className="menu-line menu-line--nested menu-line--static">
+                    <button
+                      key={label}
+                      type="button"
+                      className="menu-line menu-line--nested"
+                      onClick={handleMenuPlaceholderClick}
+                    >
                       {label}
-                    </span>
+                    </button>
                   ))}
                 </div>
               </section>
@@ -91,9 +120,14 @@ function SiteHeader() {
                 <p className="menu-group__title">Recipes by Theme</p>
                 <div className="menu-link-list">
                   {menuThemeLabels.map((label) => (
-                    <span key={label} className="menu-line menu-line--nested menu-line--static">
+                    <button
+                      key={label}
+                      type="button"
+                      className="menu-line menu-line--nested"
+                      onClick={handleMenuPlaceholderClick}
+                    >
                       {label}
-                    </span>
+                    </button>
                   ))}
                 </div>
               </section>

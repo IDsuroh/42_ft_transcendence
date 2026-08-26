@@ -11,7 +11,7 @@ function AuthPageShell({
   children,
 }) {
   return (
-    <main className="auth-shell">
+    <div className="content-frame auth-shell">
       <div className="auth-shell__frame auth-grid">
         <section className="auth-card">
           <Link className="auth-card__brand" to="/">
@@ -42,7 +42,7 @@ function AuthPageShell({
           <p className="status-banner auth-card__status">{status}</p>
         </section>
       </div>
-    </main>
+    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+function handleOpenRecordClick(_slug) {}
 
 function RecipeCard({ recipe, variant = 'default' }) {
   const cardClassName =
@@ -8,9 +8,14 @@ function RecipeCard({ recipe, variant = 'default' }) {
     <article className={cardClassName} style={{ '--recipe-accent': recipe.accent }}>
       <h3>{recipe.title}</h3>
       <p className="recipe-card__summary">{recipe.summary}</p>
-      <Link className="text-link" to={`/recipe/${recipe.slug}`}>
+      <button
+        type="button"
+        className="text-link recipe-card__link-button"
+        data-recipe-slug={recipe.slug}
+        onClick={() => handleOpenRecordClick(recipe.slug)}
+      >
         Open record
-      </Link>
+      </button>
     </article>
   )
 }

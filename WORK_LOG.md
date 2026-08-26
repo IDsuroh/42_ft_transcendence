@@ -79,6 +79,76 @@ Use this protocol whenever the user asks for a code explanation, logic walkthrou
 - When a multi-chunk explanation is in progress, save the chunk breakdown in the work log if the user wants to continue later.
 - Unless the user explicitly says otherwise, explain code logic as if the user has no background knowledge at all, including basic syntax and foundational programming concepts.
 
+## Session Start Rule
+
+- At the start of every future Codex session in this repository, read `WORK_LOG.md` before suggesting or applying changes.
+
+## Frontend Styling Rule
+
+- Do not add additional or extra styling unless the user explicitly asks for it.
+- When the user asks for structure only, keep the frontend plain and close to the existing header/footer style.
+- Use the same straightforward font direction as the existing header/footer unless the user asks for a different one.
+
+## 2026-08-26
+
+### Task
+- Save the user's standing rule for future frontend styling and session startup behavior
+
+### Actions
+- Added a session-start instruction to read `WORK_LOG.md` at the beginning of future work in this repository
+- Added a frontend styling rule to avoid extra styling unless the user explicitly requests it
+- Recorded that plain structural frontend work should stay aligned with the existing header/footer style and font direction
+
+### Notes
+- Frontend structure should default to plain layout work, not visual design expansion, unless the user asks for styling
+
+## 2026-08-26
+
+### Task
+- Record the user's current routing and URL-usage direction for later team discussion
+
+### Actions
+- Recorded that slug-based path identifiers should remain under strong consideration for single-item detail pages
+- Recorded that query parameters should remain under strong consideration for search, filtering, sorting, pagination, and similar page-state controls
+- Recorded that `id + slug` is not the preferred direction right now because it feels unnecessarily complex for the current stage
+
+### Notes
+- Current preference under discussion:
+  - path identifiers such as slugs for one-item detail pages
+  - query parameters for search and UI state
+- This is a design consideration note, not a final backend contract
+
+## 2026-08-26
+
+### Task
+- Save the user's teammate-facing routing report and note the follow-up report preference
+
+### Actions
+- Recorded the user's Teammate Report 1 text for August 26, 2026
+- Recorded that a later Teammate Report 2 for the same day is expected and should be generated from the user's queue/instructions when requested
+
+### Notes
+- User-authored report text:
+  - `Teammate Report 1 ( Auguest 26, 2026)`
+  - `Worked on the frontend routing structure.`
+  - `- React Router = the frontend routing system that decides which React page/component to show when the URL changes.`
+  - `- URL identifier = the value inside the URL that tells the app which specific record to load, for example a slug or an id.`
+  - `Difference between them:`
+  - `- React Router chooses the page type.`
+  - `- The URL identifier chooses the specific data for that page.`
+  - `(e.g.`
+  - `router is for which page in the whole site.`
+  - `/login/, /admin/, /recipe/, etc.`
+  - `Identifier is for which specific data within those respective pages.`
+  - `/login/who/, /recipe/examplefood/, etc.)`
+  - `used Reach Router + slug in my case.`
+  - `Left untouched for later:`
+  - `- The homepage recipe image/name boxes are still just clickable no-op buttons for now.`
+  - `- Nothing is connected  to backend/database data yet.`
+  - `- Real recipe-page redirection and real data loading are  for later development.`
+- Future preference:
+  - when the user later provides the queue for Teammate Report 2 on August 26, 2026, generate it in the same general reporting context unless the user asks for a different format
+
 ## 2026-07-29
 
 ### Task

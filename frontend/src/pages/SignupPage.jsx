@@ -27,7 +27,7 @@ function SignupPage() {
     <AuthPageShell
       introEyebrow="Signup page"
       introTitle="Create a cooking profile worth coming back to."
-      introDescription="Your document said not to reinvent the wheel here, so this stays direct: short inputs, clear CTA, and no full site chrome."
+      introDescription="The signup flow now uses the same shared header, footer, and typography as the rest of the frontend."
       bullets={[
         'Save favorites and profile-level recipe history.',
         'Submit recipes for moderation review later.',

@@ -16,16 +16,14 @@ import SearchResultsPage from './pages/SearchResultsPage'
 import SignupPage from './pages/SignupPage'
 import TermsPage from './pages/TermsPage'
 
-const chromeLessPaths = new Set(['/login', '/signup'])
-
 function AppShell() {
   const location = useLocation()
-  const hasChrome = !chromeLessPaths.has(location.pathname)
-  const mainClassName = hasChrome ? 'page-main' : 'page-main page-main--auth'
+  const isHomePage = location.pathname === '/'
+  const mainClassName = isHomePage ? 'page-main page-main--home' : 'page-main'
 
   return (
     <div className="site-frame">
-      {hasChrome ? <SiteHeader /> : null}
+      <SiteHeader />
 
       <main className={mainClassName}>
         <Routes>
@@ -47,7 +45,7 @@ function AppShell() {
         </Routes>
       </main>
 
-      {hasChrome ? <SiteFooter /> : null}
+      <SiteFooter />
     </div>
   )
 }

@@ -1,75 +1,87 @@
-import { Link } from 'react-router-dom'
-import SectionTitle from '../components/SectionTitle'
+const popularPlaceholders = Array.from({ length: 5 }, (_, index) => ({
+  id: `popular-${index + 1}`,
+  slug: `popular-recipe-${index + 1}`,
+  label: 'Recipe image',
+  name: 'Recipe name',
+}))
 
-const homepageSections = [
-  {
-    title: 'Featured recipe area',
-    description:
-      'This space is reserved for highlighted recipes once live data is available.',
-    actionLabel: 'Open search',
-    actionTo: '/results/search',
-  },
-  {
-    title: 'Latest recipe list area',
-    description:
-      'This space is reserved for the newest recipes returned by the backend.',
-    actionLabel: 'Browse recipes',
-    actionTo: '/results/search',
-  },
-  {
-    title: 'Category navigation area',
-    description:
-      'This space is reserved for category or theme navigation once those endpoints exist.',
-    actionLabel: 'Open connect page',
-    actionTo: '/connect',
-  },
-]
+const latestPlaceholders = Array.from({ length: 4 }, (_, index) => ({
+  id: `latest-${index + 1}`,
+  slug: `latest-recipe-${index + 1}`,
+  title: 'Recipe name',
+  posted: 'Posted x minutes ago',
+}))
+
+function handlePlaceholderClick(_slug) {}
 
 function HomePage() {
   return (
-    <div className="content-frame">
-      <section className="page-hero">
-        <div>
-          <p className="eyebrow">Landing page</p>
-          <h1>Homepage layout</h1>
-          <p className="page-hero__lead">
-            This page is now a structural shell only. Live recipe, category, and
-            ranking data has been removed until backend integration is ready.
-          </p>
-          <div className="page-hero__actions" style={{ marginTop: '24px' }}>
-            <Link className="button button--primary" to="/results/search">
-              Search recipes
-            </Link>
-            <Link className="button button--ghost" to="/add-recipe">
-              Submit a recipe
-            </Link>
-          </div>
-          <div className="hero-stats">
-            <span className="stat-pill">Featured content area</span>
-            <span className="stat-pill">Recipe list area</span>
-            <span className="stat-pill">Navigation area</span>
-          </div>
+    <div className="content-frame landing-plain">
+      <section className="landing-plain__section" aria-labelledby="popular-section-title">
+        <div className="landing-plain__titlebar">
+          <h1 id="popular-section-title">Most popular recipes over 24h</h1>
         </div>
-      </section>
 
-      <section className="page-section">
-        <SectionTitle
-          eyebrow="Homepage sections"
-          title="Database-driven content areas"
-          description="These cards mark where live database content should be rendered later."
-        />
-        <div className="feature-grid">
-          {homepageSections.map((section) => (
-            <article key={section.title} className="feature-card">
-              <p className="eyebrow">Section</p>
-              <h3>{section.title}</h3>
-              <p>{section.description}</p>
-              <Link className="text-link" to={section.actionTo}>
-                {section.actionLabel}
-              </Link>
-            </article>
+        <div className="landing-plain__popular-grid">
+          {popularPlaceholders.map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              className="landing-plain__popular-card landing-plain__card-button"
+              data-recipe-slug={item.slug}
+              onClick={() => handlePlaceholderClick(item.slug)}
+            >
+              <div className="landing-plain__image-placeholder" aria-hidden="true">
+                {item.label}
+              </div>
+              <div className="landing-plain__caption">{item.name}</div>
+            </button>
           ))}
         </div>
+
+        <button
+          type="button"
+          className="header-button landing-plain__action"
+          onClick={handlePlaceholderClick}
+        >
+          See more
+        </button>
+      </section>
+
+      <section className="landing-plain__section" aria-labelledby="latest-section-title">
+        <div className="landing-plain__titlebar">
+          <h2 id="latest-section-title">Latest recipes</h2>
+          <p>Restricted to a fixed amount for now.</p>
+        </div>
+
+        <div className="landing-plain__latest-grid">
+          {latestPlaceholders.map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              className="landing-plain__latest-card landing-plain__card-button"
+              data-recipe-slug={item.slug}
+              onClick={() => handlePlaceholderClick(item.slug)}
+            >
+              <div className="landing-plain__latest-image" aria-hidden="true">
+                Recipe image
+              </div>
+
+              <div className="landing-plain__latest-copy">
+                <h3>{item.title}</h3>
+                <p>{item.posted}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="header-button landing-plain__action"
+          onClick={handlePlaceholderClick}
+        >
+          See more
+        </button>
       </section>
     </div>
   )

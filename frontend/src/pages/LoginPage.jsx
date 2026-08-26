@@ -26,7 +26,7 @@ function LoginPage() {
     <AuthPageShell
       introEyebrow="Login page"
       introTitle="Come back to your saved recipes."
-      introDescription="This page intentionally drops the shared site header so the login flow feels focused and uncluttered."
+      introDescription="The login flow now keeps the same site framing and typography as the rest of the frontend."
       bullets={[
         'Profile access for your own recipes and favorites.',
         'Future moderation updates on pending recipe submissions.',
