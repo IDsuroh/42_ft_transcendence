@@ -230,6 +230,7 @@
   color: var(--ink);
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .header-button--profile {
@@ -548,6 +549,74 @@
 .landing-plain__latest-copy p {
   margin: 6px 0 0;
   color: var(--muted);
+}
+
+.category-browser__top-grid,
+.category-browser__grid {
+  display: grid;
+  gap: 16px;
+}
+
+.category-browser__top-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.category-browser__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.category-browser__tile {
+  aspect-ratio: 1 / 1;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.category-browser__tile--top {
+  aspect-ratio: 1 / 1;
+}
+
+.category-browser__image {
+  min-height: 0;
+  border-bottom: 2px solid rgba(69, 45, 36, 0.72);
+}
+
+.category-browser__pagination {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.category-browser__nav-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.category-browser__nav-group--left {
+  justify-content: flex-end;
+}
+
+.category-browser__nav-group--right {
+  justify-content: flex-start;
+}
+
+.category-browser__page-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.category-browser__page-button {
+  width: 46px;
+  padding: 0;
+}
+
+.category-browser__page-button.is-active,
+.category-browser__page-button:disabled {
+  background: #f2eadc;
+  cursor: default;
 }
 
 .hero-grid,
@@ -1058,6 +1127,10 @@
     grid-template-columns: 1fr;
   }
 
+  .category-browser__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .section-heading {
     gap: 16px;
   }
@@ -1115,12 +1188,23 @@
   }
 
   .landing-plain__popular-grid,
-  .landing-plain__latest-grid {
+  .landing-plain__latest-grid,
+  .category-browser__grid {
     grid-template-columns: 1fr;
   }
 
   .landing-plain__latest-image {
     min-height: 180px;
+  }
+
+  .category-browser__top-grid {
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .category-browser__pagination {
+    justify-content: center;
   }
 
   .menu-panel {

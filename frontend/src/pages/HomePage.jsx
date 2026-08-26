@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 const popularPlaceholders = Array.from({ length: 5 }, (_, index) => ({
   id: `popular-${index + 1}`,
   slug: `popular-recipe-${index + 1}`,
@@ -10,6 +12,12 @@ const latestPlaceholders = Array.from({ length: 4 }, (_, index) => ({
   slug: `latest-recipe-${index + 1}`,
   title: 'Recipe name',
   posted: 'Posted x minutes ago',
+}))
+
+const topCategoryPlaceholders = Array.from({ length: 5 }, (_, index) => ({
+  id: `landing-category-${index + 1}`,
+  label: 'Category image',
+  name: `Top category ${String(index + 1).padStart(2, '0')}`,
 }))
 
 function handlePlaceholderClick(_slug) {}
@@ -82,6 +90,36 @@ function HomePage() {
         >
           See more
         </button>
+      </section>
+
+      <section className="landing-plain__section" aria-labelledby="landing-top-categories-title">
+        <div className="landing-plain__titlebar">
+          <h2 id="landing-top-categories-title">Top 5 categories</h2>
+          <p>These featured category placeholders match the category page layout.</p>
+        </div>
+
+        <div className="category-browser__top-grid">
+          {topCategoryPlaceholders.map((category) => (
+            <button
+              type="button"
+              key={category.id}
+              className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
+              onClick={handlePlaceholderClick}
+            >
+              <div
+                className="landing-plain__image-placeholder category-browser__image"
+                aria-hidden="true"
+              >
+                {category.label}
+              </div>
+              <div className="landing-plain__caption">{category.name}</div>
+            </button>
+          ))}
+        </div>
+
+        <Link className="header-button landing-plain__action" to="/category">
+          See more Categories
+        </Link>
       </section>
     </div>
   )
