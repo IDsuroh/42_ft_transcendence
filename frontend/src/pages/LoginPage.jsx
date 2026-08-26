@@ -25,12 +25,12 @@ function LoginPage() {
   return (
     <AuthPageShell
       introEyebrow="Login page"
-      introTitle="Come back to your saved recipes."
-      introDescription="The login flow now keeps the same site framing and typography as the rest of the frontend."
+      introTitle="Welcome back to your kitchen corner."
+      introDescription="Sign in to pick up where you left off, revisit saved recipes, and keep your own food space in one place."
       bullets={[
-        'Profile access for your own recipes and favorites.',
-        'Future moderation updates on pending recipe submissions.',
-        'Clean handoff point for Django session-based authentication.',
+        'Find your saved recipes without digging for them again.',
+        'Get back to the dishes you meant to try next.',
+        'Keep your account ready for sharing and saving more later.',
       ]}
       formEyebrow="Sign in"
       formTitle="Log in"

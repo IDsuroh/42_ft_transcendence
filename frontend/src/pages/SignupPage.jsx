@@ -27,11 +27,11 @@ function SignupPage() {
     <AuthPageShell
       introEyebrow="Signup page"
       introTitle="Create a cooking profile worth coming back to."
-      introDescription="The signup flow now uses the same shared header, footer, and typography as the rest of the frontend."
+      introDescription="Create an account to save favorites, manage your profile, and come back to recipes later."
       bullets={[
-        'Save favorites and profile-level recipe history.',
-        'Submit recipes for moderation review later.',
-        'Keep the page simple enough for fast backend hookup.',
+        'Start your own recipe space and keep the dishes you want to revisit.',
+        'Save favorites in one place instead of hunting for them again later.',
+        'Join now and share your recipes',
       ]}
       formEyebrow="Register"
       formTitle="Create account"
