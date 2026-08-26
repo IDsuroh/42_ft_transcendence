@@ -1,19 +1,15 @@
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 
-const topCategoryPlaceholders = Array.from({ length: 5 }, (_, index) => ({
-  id: `top-category-${index + 1}`,
-  label: 'Category image',
-  name: `Top category ${String(index + 1).padStart(2, '0')}`,
-}))
-
-const totalPages = 3
 const categoriesPerPage = 18
-const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1)
-const categoryPlaceholders = Array.from({ length: totalPages * categoriesPerPage }, (_, index) => ({
+const categoryPlaceholders = Array.from({ length: 54 }, (_, index) => ({
   id: `category-${index + 1}`,
   label: 'Category image',
   name: `Category ${String(index + 1).padStart(2, '0')}`,
+  detailPath: index === 0 ? '/category/category-01' : null,
 }))
+const topCategoryPlaceholders = categoryPlaceholders.slice(0, 5)
+const totalPages = Math.ceil(categoryPlaceholders.length / categoriesPerPage)
+const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1)
 
 function handlePlaceholderClick() {}
 
@@ -45,22 +41,34 @@ function CategoryPage() {
       <section className="landing-plain__section" aria-labelledby="top-categories-title">
         <div className="landing-plain__titlebar">
           <h2 id="top-categories-title">Top 5 categories</h2>
-          <p>This block stays visible on every category-directory page.</p>
         </div>
 
         <div className="category-browser__top-grid">
           {topCategoryPlaceholders.map((category) => (
-            <button
-              type="button"
-              key={category.id}
-              className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
-              onClick={handlePlaceholderClick}
-            >
-              <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
-                {category.label}
-              </div>
-              <div className="landing-plain__caption">{category.name}</div>
-            </button>
+            category.detailPath ? (
+              <Link
+                key={category.id}
+                className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
+                to={category.detailPath}
+              >
+                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
+                  {category.label}
+                </div>
+                <div className="landing-plain__caption">{category.name}</div>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                key={category.id}
+                className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
+                onClick={handlePlaceholderClick}
+              >
+                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
+                  {category.label}
+                </div>
+                <div className="landing-plain__caption">{category.name}</div>
+              </button>
+            )
           ))}
         </div>
       </section>
@@ -68,22 +76,35 @@ function CategoryPage() {
       <section className="landing-plain__section" aria-labelledby="all-categories-title">
         <div className="landing-plain__titlebar">
           <h2 id="all-categories-title">All categories</h2>
-          <p>{`Page ${currentPage} of ${totalPages}. Each page shows 18 placeholder category buttons.`}</p>
+          <p>{`Page ${currentPage} of ${totalPages}`}</p>
         </div>
 
         <div className="category-browser__grid">
           {currentCategories.map((category) => (
-            <button
-              type="button"
-              key={category.id}
-              className="landing-plain__popular-card landing-plain__card-button category-browser__tile"
-              onClick={handlePlaceholderClick}
-            >
-              <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
-                {category.label}
-              </div>
-              <div className="landing-plain__caption">{category.name}</div>
-            </button>
+            category.detailPath ? (
+              <Link
+                key={category.id}
+                className="landing-plain__popular-card landing-plain__card-button category-browser__tile"
+                to={category.detailPath}
+              >
+                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
+                  {category.label}
+                </div>
+                <div className="landing-plain__caption">{category.name}</div>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                key={category.id}
+                className="landing-plain__popular-card landing-plain__card-button category-browser__tile"
+                onClick={handlePlaceholderClick}
+              >
+                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
+                  {category.label}
+                </div>
+                <div className="landing-plain__caption">{category.name}</div>
+              </button>
+            )
           ))}
         </div>
 

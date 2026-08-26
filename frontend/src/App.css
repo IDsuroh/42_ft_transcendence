@@ -579,6 +579,16 @@
   border-bottom: 2px solid rgba(69, 45, 36, 0.72);
 }
 
+.category-detail__featured-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.category-detail__featured-card {
+  width: 100%;
+}
+
 .category-browser__pagination {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);

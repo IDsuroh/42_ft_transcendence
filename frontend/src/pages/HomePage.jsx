@@ -15,9 +15,10 @@ const latestPlaceholders = Array.from({ length: 4 }, (_, index) => ({
 }))
 
 const topCategoryPlaceholders = Array.from({ length: 5 }, (_, index) => ({
-  id: `landing-category-${index + 1}`,
+  id: `top-category-${index + 1}`,
   label: 'Category image',
-  name: `Top category ${String(index + 1).padStart(2, '0')}`,
+  name: `Category ${String(index + 1).padStart(2, '0')}`,
+  detailPath: index === 0 ? '/category/category-01' : null,
 }))
 
 function handlePlaceholderClick(_slug) {}
@@ -95,25 +96,40 @@ function HomePage() {
       <section className="landing-plain__section" aria-labelledby="landing-top-categories-title">
         <div className="landing-plain__titlebar">
           <h2 id="landing-top-categories-title">Top 5 categories</h2>
-          <p>These featured category placeholders match the category page layout.</p>
         </div>
 
         <div className="category-browser__top-grid">
           {topCategoryPlaceholders.map((category) => (
-            <button
-              type="button"
-              key={category.id}
-              className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
-              onClick={handlePlaceholderClick}
-            >
-              <div
-                className="landing-plain__image-placeholder category-browser__image"
-                aria-hidden="true"
+            category.detailPath ? (
+              <Link
+                key={category.id}
+                className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
+                to={category.detailPath}
               >
-                {category.label}
-              </div>
-              <div className="landing-plain__caption">{category.name}</div>
-            </button>
+                <div
+                  className="landing-plain__image-placeholder category-browser__image"
+                  aria-hidden="true"
+                >
+                  {category.label}
+                </div>
+                <div className="landing-plain__caption">{category.name}</div>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                key={category.id}
+                className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
+                onClick={handlePlaceholderClick}
+              >
+                <div
+                  className="landing-plain__image-placeholder category-browser__image"
+                  aria-hidden="true"
+                >
+                  {category.label}
+                </div>
+                <div className="landing-plain__caption">{category.name}</div>
+              </button>
+            )
           ))}
         </div>
 
