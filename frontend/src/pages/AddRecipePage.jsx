@@ -1,5 +1,20 @@
 import { useState } from 'react'
 
+function RepeatableFieldPanel({ eyebrow, title, items, renderItem, addLabel, onAdd }) {
+  return (
+    <article className="form-panel">
+      <p className="eyebrow">{eyebrow}</p>
+      <h3>{title}</h3>
+      <div className="dynamic-list form-panel__body">{items.map(renderItem)}</div>
+      <div className="form-panel__actions">
+        <button type="button" className="button button--ghost" onClick={onAdd}>
+          {addLabel}
+        </button>
+      </div>
+    </article>
+  )
+}
+
 function AddRecipePage() {
   const [recipeName, setRecipeName] = useState('')
   const [ingredients, setIngredients] = useState([{ ingredient: '', quantity: '' }])
@@ -36,6 +51,22 @@ function AddRecipePage() {
     )
   }
 
+  function addCategoryField() {
+    setCategories((current) => [...current, ''])
+  }
+
+  function addIngredientField() {
+    setIngredients((current) => [...current, { ingredient: '', quantity: '' }])
+  }
+
+  function addStepField() {
+    setSteps((current) => [...current, ''])
+  }
+
+  function addPictureField() {
+    setPictures((current) => [...current, ''])
+  }
+
   function handleSubmit(event) {
     event.preventDefault()
 
@@ -63,7 +94,7 @@ function AddRecipePage() {
           <article className="form-panel">
             <p className="eyebrow">Recipe basics</p>
             <h3>Main information</h3>
-            <div className="field-list" style={{ marginTop: '18px' }}>
+            <div className="field-list form-panel__body">
               <div className="field">
                 <label htmlFor="recipe-name">Recipe name</label>
                 <input
@@ -90,131 +121,100 @@ function AddRecipePage() {
                   ))}
                 </div>
               </div>
-
+            </div>
+            <div className="form-panel__actions">
               <button
                 type="button"
                 className="button button--ghost"
-                onClick={() => setCategories((current) => [...current, ''])}
+                onClick={addCategoryField}
               >
                 Add category field
               </button>
             </div>
           </article>
 
-          <article className="form-panel">
-            <p className="eyebrow">Ingredients</p>
-            <h3>Repeatable ingredient fields</h3>
-            <div className="dynamic-list" style={{ marginTop: '18px' }}>
-              {ingredients.map((item, index) => (
-                <div key={`${item.ingredient}-${index}`} className="dynamic-card field-list">
-                  <div className="field">
-                    <label>Ingredient</label>
-                    <input
-                      type="text"
-                      value={item.ingredient}
-                      onChange={(event) =>
-                        updateIngredient(index, 'ingredient', event.target.value)
-                      }
-                      placeholder="Ingredient name"
-                    />
-                  </div>
-
-                  <div className="field">
-                    <label>Quantity</label>
-                    <input
-                      type="text"
-                      value={item.quantity}
-                      onChange={(event) =>
-                        updateIngredient(index, 'quantity', event.target.value)
-                      }
-                      placeholder="Quantity and unit from user input"
-                    />
-                  </div>
+          <RepeatableFieldPanel
+            eyebrow="Ingredients"
+            title="Repeatable ingredient fields"
+            items={ingredients}
+            renderItem={(item, index) => (
+              <div key={`${item.ingredient}-${index}`} className="dynamic-card field-list">
+                <div className="field">
+                  <label>Ingredient</label>
+                  <input
+                    type="text"
+                    value={item.ingredient}
+                    onChange={(event) =>
+                      updateIngredient(index, 'ingredient', event.target.value)
+                    }
+                    placeholder="Ingredient name"
+                  />
                 </div>
-              ))}
-            </div>
 
-            <div style={{ marginTop: '18px' }}>
-              <button
-                type="button"
-                className="button button--ghost"
-                onClick={() =>
-                  setIngredients((current) => [
-                    ...current,
-                    { ingredient: '', quantity: '' },
-                  ])
-                }
-              >
-                Add ingredient field
-              </button>
-            </div>
-          </article>
-
-          <article className="form-panel">
-            <p className="eyebrow">Steps</p>
-            <h3>Repeatable step fields</h3>
-            <div className="dynamic-list" style={{ marginTop: '18px' }}>
-              {steps.map((step, index) => (
-                <div key={`step-${index + 1}`} className="dynamic-card field-list">
-                  <div className="field">
-                    <label>{`Step ${index + 1}`}</label>
-                    <textarea
-                      rows="4"
-                      value={step}
-                      onChange={(event) => updateStep(index, event.target.value)}
-                      placeholder="Step text from user input"
-                    />
-                  </div>
+                <div className="field">
+                  <label>Quantity</label>
+                  <input
+                    type="text"
+                    value={item.quantity}
+                    onChange={(event) =>
+                      updateIngredient(index, 'quantity', event.target.value)
+                    }
+                    placeholder="Quantity and unit from user input"
+                  />
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+            addLabel="Add ingredient field"
+            onAdd={addIngredientField}
+          />
 
-            <div style={{ marginTop: '18px' }}>
-              <button
-                type="button"
-                className="button button--ghost"
-                onClick={() => setSteps((current) => [...current, ''])}
-              >
-                Add step field
-              </button>
-            </div>
-          </article>
-
-          <article className="form-panel">
-            <p className="eyebrow">Pictures</p>
-            <h3>Image reference fields</h3>
-            <div className="dynamic-list" style={{ marginTop: '18px' }}>
-              {pictures.map((picture, index) => (
-                <div key={`picture-${index + 1}`} className="dynamic-card field-list">
-                  <div className="field">
-                    <label>{`Picture ${index + 1}`}</label>
-                    <input
-                      type="text"
-                      value={picture}
-                      onChange={(event) => updatePicture(index, event.target.value)}
-                      placeholder="Stored file reference or upload result"
-                    />
-                  </div>
+          <RepeatableFieldPanel
+            eyebrow="Steps"
+            title="Repeatable step fields"
+            items={steps}
+            renderItem={(step, index) => (
+              <div key={`step-${index + 1}`} className="dynamic-card field-list">
+                <div className="field">
+                  <label>{`Step ${index + 1}`}</label>
+                  <textarea
+                    rows="4"
+                    value={step}
+                    onChange={(event) => updateStep(index, event.target.value)}
+                    placeholder="Step text from user input"
+                  />
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+            addLabel="Add step field"
+            onAdd={addStepField}
+          />
 
-            <div style={{ marginTop: '18px' }}>
-              <button
-                type="button"
-                className="button button--ghost"
-                onClick={() => setPictures((current) => [...current, ''])}
-              >
-                Add image field
-              </button>
-            </div>
-          </article>
+          <RepeatableFieldPanel
+            eyebrow="Pictures"
+            title="Image reference fields"
+            items={pictures}
+            renderItem={(picture, index) => (
+              <div key={`picture-${index + 1}`} className="dynamic-card field-list">
+                <div className="field">
+                  <label>{`Picture ${index + 1}`}</label>
+                  <input
+                    type="text"
+                    value={picture}
+                    onChange={(event) => updatePicture(index, event.target.value)}
+                    placeholder="Stored file reference or upload result"
+                  />
+                </div>
+              </div>
+            )}
+            addLabel="Add image field"
+            onAdd={addPictureField}
+          />
 
-          <article className="form-panel" style={{ gridColumn: '1 / -1' }}>
+          <article className="form-panel form-panel--full">
             <p className="eyebrow">Submission state</p>
             <h3>Submission status</h3>
-            <p className="status-banner">{status}</p>
-            <div style={{ marginTop: '18px' }}>
+            <p className="status-banner form-panel__body">{status}</p>
+            <div className="form-panel__actions">
               <button type="submit" className="button button--primary">
                 Submit recipe
               </button>

@@ -512,6 +512,18 @@
   padding: 28px;
 }
 
+.form-panel--full {
+  grid-column: 1 / -1;
+}
+
+.form-panel__body {
+  margin-top: 18px;
+}
+
+.form-panel__actions {
+  margin-top: 18px;
+}
+
 .recipe-card {
   min-height: 100%;
   padding: 24px;
