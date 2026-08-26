@@ -491,3 +491,64 @@ Use this protocol whenever the user asks for a code explanation, logic walkthrou
 - The frontend now behaves more honestly as a structural shell: category routes no longer pretend real category pages exist, and the shared data file no longer injects fake recipe/profile/admin records
 - Runtime verification could not be completed in this shell because `node` and `npm` are unavailable here, so today's checks were limited to source inspection
 - Remaining `placeholder="..."` attributes in form fields are standard input placeholder text, not mock content records
+
+## 2026-08-26
+
+### Task
+- Unify the frontend visual style around the landing-page system, refine auth page copy, and build a placeholder category directory plus one sample category detail page
+
+### Actions
+- Normalized the frontend layout so the inner pages, login page, and signup page follow the same visual direction as the landing page, header, and footer
+- Refined shared styling in `frontend/src/App.css` so the boxed landing-page treatment is used more consistently across sections, cards, form surfaces, and navigation controls
+- Updated the login and signup page messaging to use more natural and more persuasive copy
+- Added a placeholder category directory page at `frontend/src/pages/CategoryPage.jsx`
+- Added `/category` routing in `frontend/src/App.jsx`
+- Built the category directory with:
+  - `Top 5 categories`
+  - `All categories`
+  - 18 placeholder category cards per page
+  - 3 pages total
+- Added centered pagination controls with `First`, `Previous`, numbered page buttons, `Next`, and `Last`
+- Adjusted the pagination layout so the numbered page buttons remain fixed in the page center even when the side navigation buttons appear or disappear
+- Styled the category cards as square cards and set the main category grid to 3 cards per row
+- Kept the top 5 category cards in a single row
+- Replaced the old landing-page category entry block with visible top-category cards plus a `See more Categories` button
+- Added a sample category detail page at `frontend/src/pages/CategoryDetailPage.jsx`
+- Added `/category/:slug` handling in `frontend/src/App.jsx`
+- Limited the active sample detail route to `Category 01` for now, while leaving the other category cards as placeholder no-op buttons
+- Built the sample category detail page with:
+  - `Trending Recipe in This Category`
+  - `List of All Recipes in This Category`
+  - no-op sample recipe buttons named `Sample recipe 01` through `Sample recipe 18`
+- Removed the extra temporary category placeholder data file and simplified the sample category behavior back into the page files
+- Created a teammate-facing uploadable summary in `teammate_report_2.md`
+
+### Notes
+- The category flow remains frontend-only placeholder behavior and does not assume a backend or final database schema yet
+- Runtime verification could not be completed in this shell because `node` and `npm` are unavailable here, so today's checks were limited to source inspection
+
+### Teammate Report 1
+- Worked on the frontend routing structure.
+- `React Router` = the frontend routing system that decides which React page/component to show when the URL changes.
+- `URL identifier` = the value inside the URL that tells the app which specific record to load, for example a slug or an id.
+- Difference between them:
+- `React Router` chooses the page type.
+- The URL identifier chooses the specific data for that page.
+- Example:
+- Router is for which page in the whole site.
+- `/login/`, `/admin/`, `/recipe/`, etc.
+- Identifier is for which specific data within those respective pages.
+- `/login/who/`, `/recipe/examplefood/`, etc.
+- Used React Router + slug in my case.
+- Left untouched for later:
+- The homepage recipe image/name boxes are still just clickable no-op buttons for now.
+- Nothing is connected to backend/database data yet.
+- Real recipe-page redirection and real data loading are for later development.
+
+### Teammate Report 2
+- Main focus: landing page, category page, category detail page, and auth page cleanup.
+- Landing page: added visible top-category cards and kept a `See more Categories` entry into the category flow.
+- Category page: added the main category directory layout with `Top 5 categories`, `All categories`, square cards, and centered pagination.
+- Category detail page: built one sample category view for `Category 01` with a trending recipe block and a list of sample recipes.
+- Login and signup pages: cleaned up the copy and kept them aligned with the shared frontend layout.
+- Current status: category work is still frontend-only placeholder behavior with no backend or database connection yet.
