@@ -18,7 +18,7 @@ function ConnectPage() {
             Jump into saved recipes, profile history, and future moderation updates.
           </p>
           <div className="connect-grid__actions" style={{ marginTop: '20px' }}>
-            <Link className="button button--primary" to="/login">
+            <Link className="button button--ghost" to="/login">
               Log in
             </Link>
           </div>
@@ -31,7 +31,7 @@ function ConnectPage() {
             Start with the signup flow, then come back to propose recipes and build favorites.
           </p>
           <div className="connect-grid__actions" style={{ marginTop: '20px' }}>
-            <Link className="button button--secondary" to="/signup">
+            <Link className="button button--ghost" to="/signup">
               Create account
             </Link>
           </div>

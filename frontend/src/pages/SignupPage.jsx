@@ -72,7 +72,7 @@ function SignupPage() {
         </div>
 
         <div className="auth-card__actions">
-          <button type="submit" className="button button--primary">
+          <button type="submit" className="button button--ghost">
             Create account
           </button>
           <Link className="button button--ghost" to="/login">

@@ -1,175 +1,50 @@
-import { Link, useSearchParams } from 'react-router-dom'
-
-const categoriesPerPage = 18
-const categoryPlaceholders = Array.from({ length: 54 }, (_, index) => ({
-  id: `category-${index + 1}`,
-  label: 'Category image',
-  name: `Category ${String(index + 1).padStart(2, '0')}`,
-  detailPath: index === 0 ? '/category/category-01' : null,
-}))
-const topCategoryPlaceholders = categoryPlaceholders.slice(0, 5)
-const totalPages = Math.ceil(categoryPlaceholders.length / categoriesPerPage)
-const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1)
-
-function handlePlaceholderClick() {}
+import { Link, useParams } from 'react-router-dom'
+import RecipeCard from '../components/RecipeCard'
+import { getCategoryBySlug, getRecipesByCategory } from '../data/siteData'
 
 function CategoryPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const requestedPage = Number.parseInt(searchParams.get('page') ?? '1', 10)
-  const currentPage =
-    Number.isInteger(requestedPage) && requestedPage >= 1 && requestedPage <= totalPages
-      ? requestedPage
-      : 1
+  const { slug = '' } = useParams()
+  const category = getCategoryBySlug(slug)
+  const categoryRecipes = getRecipesByCategory(slug)
 
-  const pageStartIndex = (currentPage - 1) * categoriesPerPage
-  const currentCategories = categoryPlaceholders.slice(
-    pageStartIndex,
-    pageStartIndex + categoriesPerPage,
-  )
-
-  function goToPage(page) {
-    if (page <= 1) {
-      setSearchParams({})
-      return
-    }
-
-    setSearchParams({ page: String(page) })
+  if (!category) {
+    return (
+      <div className="content-frame">
+        <section className="page-hero">
+          <p className="eyebrow">Category page</p>
+          <h1>Category not found</h1>
+          <p className="page-hero__lead">
+            This category route does not match the current recipe type list.
+          </p>
+          <div className="page-hero__actions">
+            <Link className="header-button" to="/">
+              Back to landing page
+            </Link>
+          </div>
+        </section>
+      </div>
+    )
   }
 
   return (
-    <div className="content-frame landing-plain">
-      <section className="landing-plain__section" aria-labelledby="top-categories-title">
-        <div className="landing-plain__titlebar">
-          <h2 id="top-categories-title">Top 5 categories</h2>
-        </div>
-
-        <div className="category-browser__top-grid">
-          {topCategoryPlaceholders.map((category) => (
-            category.detailPath ? (
-              <Link
-                key={category.id}
-                className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
-                to={category.detailPath}
-              >
-                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
-                  {category.label}
-                </div>
-                <div className="landing-plain__caption">{category.name}</div>
-              </Link>
-            ) : (
-              <button
-                type="button"
-                key={category.id}
-                className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
-                onClick={handlePlaceholderClick}
-              >
-                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
-                  {category.label}
-                </div>
-                <div className="landing-plain__caption">{category.name}</div>
-              </button>
-            )
-          ))}
-        </div>
+    <div className="content-frame">
+      <section className="page-hero">
+        <p className="eyebrow">Category page</p>
+        <h1>{category.name}</h1>
       </section>
 
-      <section className="landing-plain__section" aria-labelledby="all-categories-title">
-        <div className="landing-plain__titlebar">
-          <h2 id="all-categories-title">All categories</h2>
-          <p>{`Page ${currentPage} of ${totalPages}`}</p>
-        </div>
-
-        <div className="category-browser__grid">
-          {currentCategories.map((category) => (
-            category.detailPath ? (
-              <Link
-                key={category.id}
-                className="landing-plain__popular-card landing-plain__card-button category-browser__tile"
-                to={category.detailPath}
-              >
-                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
-                  {category.label}
-                </div>
-                <div className="landing-plain__caption">{category.name}</div>
-              </Link>
-            ) : (
-              <button
-                type="button"
-                key={category.id}
-                className="landing-plain__popular-card landing-plain__card-button category-browser__tile"
-                onClick={handlePlaceholderClick}
-              >
-                <div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">
-                  {category.label}
-                </div>
-                <div className="landing-plain__caption">{category.name}</div>
-              </button>
-            )
-          ))}
-        </div>
-
-        <div className="category-browser__pagination" aria-label="Category pages">
-          <div className="category-browser__nav-group category-browser__nav-group--left">
-            {currentPage > 1 ? (
-              <>
-                <button
-                  type="button"
-                  className="header-button"
-                  onClick={() => goToPage(1)}
-                >
-                  First
-                </button>
-                <button
-                  type="button"
-                  className="header-button"
-                  onClick={() => goToPage(currentPage - 1)}
-                >
-                  Previous
-                </button>
-              </>
-            ) : null}
-          </div>
-
-          <div className="category-browser__page-list" aria-label="Page numbers">
-            {pageNumbers.map((pageNumber) => (
-              <button
-                type="button"
-                key={pageNumber}
-                className={
-                  pageNumber === currentPage
-                    ? 'header-button category-browser__page-button is-active'
-                    : 'header-button category-browser__page-button'
-                }
-                onClick={() => goToPage(pageNumber)}
-                disabled={pageNumber === currentPage}
-                aria-current={pageNumber === currentPage ? 'page' : undefined}
-              >
-                {pageNumber}
-              </button>
+      <section className="page-section">
+        {categoryRecipes.length > 0 ? (
+          <div className="results-grid">
+            {categoryRecipes.map((recipe) => (
+              <RecipeCard key={recipe.slug} recipe={recipe} variant="compact" />
             ))}
           </div>
-
-          <div className="category-browser__nav-group category-browser__nav-group--right">
-            {currentPage < totalPages ? (
-              <>
-                <button
-                  type="button"
-                  className="header-button"
-                  onClick={() => goToPage(currentPage + 1)}
-                >
-                  Next
-                </button>
-                <button
-                  type="button"
-                  className="header-button"
-                  onClick={() => goToPage(totalPages)}
-                >
-                  Last
-                </button>
-              </>
-            ) : null}
+        ) : (
+          <div className="empty-state">
+            No recipes are currently available in this category.
           </div>
-        </div>
+        )}
       </section>
     </div>
   )

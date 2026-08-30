@@ -60,7 +60,7 @@ function LoginPage() {
         </div>
 
         <div className="auth-card__actions">
-          <button type="submit" className="button button--primary">
+          <button type="submit" className="button button--ghost">
             Continue
           </button>
           <Link className="button button--ghost" to="/signup">
