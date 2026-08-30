@@ -3,6 +3,42 @@ export const viewer = {
   name: '',
 }
 
+// Temporary development-only auth preview helper.
+// Remove this session-based preview path once Django-backed auth is connected.
+const devAuthPreviewStorageKey = 'recipe-site-dev-auth-preview'
+
+export function isDevAuthPreviewEnabled() {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return window.sessionStorage.getItem(devAuthPreviewStorageKey) === 'true'
+}
+
+export function isViewerAuthenticated() {
+  if (viewer.isAuthenticated) {
+    return true
+  }
+
+  return isDevAuthPreviewEnabled()
+}
+
+export function enableDevAuthPreview() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.sessionStorage.setItem(devAuthPreviewStorageKey, 'true')
+}
+
+export function disableDevAuthPreview() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.sessionStorage.removeItem(devAuthPreviewStorageKey)
+}
+
 export const sampleRecipeSlug = 'sample-recipe'
 export const sampleRecipePath = `/recipe/${sampleRecipeSlug}`
 
@@ -46,12 +82,11 @@ export const landingRecipeCategories = recipeCategories.filter(
 export const recipes = []
 
 export const profilePreview = {
-  name: 'Your profile',
-  role: 'Account overview',
-  bio: 'Profile details will appear here after account data is connected.',
+  name: 'Sample profile',
+  role: 'Profile preview',
+  bio: 'This is a sample profile preview until account data is connected.',
   yourRecipeSlugs: [],
   favoriteRecipeSlugs: [],
-  draftRecipes: [],
   isAdmin: false,
 }
 

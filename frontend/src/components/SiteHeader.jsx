@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { menuRecipeTypeLabels, menuThemeLabels, viewer } from '../data/siteData'
+import {
+  isViewerAuthenticated,
+  menuRecipeTypeLabels,
+  menuThemeLabels,
+} from '../data/siteData'
 
 function handleMenuPlaceholderClick() {}
 
 function SiteHeader() {
   const location = useLocation()
   const navigate = useNavigate()
+  const isAuthenticated = isViewerAuthenticated()
   const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
   const menuPopoverRef = useRef(null)
@@ -77,13 +82,12 @@ function SiteHeader() {
             className={menuOpen ? 'menu-panel is-open' : 'menu-panel'}
           >
             <div className="menu-panel__stack">
-              <button
-                type="button"
-                className="menu-line"
-                onClick={handleMenuPlaceholderClick}
-              >
-                Propose a recipe <span className="menu-line__hint">(needs login)</span>
-              </button>
+              <Link className="menu-line" to={isAuthenticated ? '/add-recipe' : '/connect'}>
+                Propose a recipe{' '}
+                {!isAuthenticated ? (
+                  <span className="menu-line__hint">(needs login)</span>
+                ) : null}
+              </Link>
 
               <section className="menu-group">
                 <p className="menu-group__title">Recipes by Type</p>
@@ -141,14 +145,14 @@ function SiteHeader() {
         </form>
 
         <div className="header-actions">
-          {!viewer.isAuthenticated ? (
+          {!isAuthenticated ? (
             <Link className="header-button" to="/connect">
               Connect
             </Link>
           ) : null}
           <Link
             className="header-button header-button--profile"
-            to={viewer.isAuthenticated ? '/profile' : '/connect'}
+            to={isAuthenticated ? '/profile' : '/connect'}
           >
             Profile
           </Link>

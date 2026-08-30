@@ -1063,6 +1063,151 @@
   gap: 14px;
 }
 
+.add-recipe-form__submit-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.add-recipe-submitted__frame {
+  display: grid;
+  min-height: calc(100dvh - 280px);
+}
+
+.add-recipe-submitted {
+  display: grid;
+  margin-top: 0;
+  min-height: 100%;
+  place-items: center;
+}
+
+.add-recipe-submitted__content {
+  width: min(720px, 100%);
+  display: grid;
+  gap: 16px;
+}
+
+.add-recipe-submitted__panel {
+  width: 100%;
+  padding: 36px 40px;
+  text-align: center;
+}
+
+.add-recipe-submitted__panel h1 {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  line-height: 1.2;
+}
+
+.add-recipe-submitted__body p {
+  margin: 0;
+}
+
+.add-recipe-submitted__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.detail-panel.detail-panel--profile-section {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px 20px;
+}
+
+.profile-page .eyebrow,
+.profile-page .page-hero h1,
+.profile-page .page-hero__lead,
+.profile-page .stat-pill,
+.profile-page .landing-plain__caption,
+.detail-panel .profile-page__section-title {
+  color: #000;
+}
+
+.profile-page__section-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: clamp(1.28rem, 2.4vw, 1.65rem);
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.profile-page__section-note {
+  margin: 0;
+  color: #000;
+}
+
+.profile-page__section-note--pending {
+  font-synthesis: style;
+  font-style: italic;
+}
+
+.profile-page__empty-copy {
+  margin: 8px 0 0;
+  color: #000;
+  font-style: italic;
+  text-align: center;
+}
+
+.profile-preview-grid {
+  margin-top: 0;
+}
+
+.profile-preview-card {
+  position: relative;
+}
+
+.profile-preview-card__image {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-page__add-recipe-row {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.connect-page {
+  display: grid;
+  gap: 18px;
+}
+
+.dev-auth-preview {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dev-auth-preview__button {
+  display: grid;
+  place-items: center;
+  width: 118px;
+  height: 118px;
+  padding: 14px;
+  border: 3px solid #5c1366;
+  border-radius: 999px;
+  background: #b6ff00;
+  color: #5c1366;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.dev-auth-preview__button:hover {
+  background: #8ef70f;
+}
+
+.profile-page__dev-preview {
+  margin-top: 22px;
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -1190,6 +1335,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   align-items: stretch;
+}
+
+.site-footer__links--authenticated {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .site-footer__aside {

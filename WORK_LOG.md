@@ -163,6 +163,32 @@ Use this protocol whenever the user asks for a code explanation, logic walkthrou
 - Future preference:
   - when the user later provides the queue for Teammate Report 2 on August 26, 2026, generate it in the same general reporting context unless the user asks for a different format
 
+## 2026-08-30
+
+### Task
+- Save a teammate-facing report for the recent frontend profile/auth flow changes
+- Record follow-up work still needed on the add-recipe page
+
+### Actions
+- Recorded a concise teammate report covering profile page creation/refinement, auth-route cleanup, footer behavior changes, temporary recipe-request storage removal, and auth-state testing
+- Saved remaining add-recipe follow-up items as explicit notes for later implementation
+
+### Notes
+- Teammate Report (August 30, 2026)
+- Built and refined the profile page flow, including the profile hero and the recipe, favourites, and pending-request sections.
+- Updated the profile page text styling so the main profile title and profile box titles render black consistently.
+- Removed the temporary frontend-only recipe request persistence and changed the profile/add-recipe messaging so it no longer implies database-backed saving exists yet.
+- Hid `Connect` in the footer for authenticated state and redirected authenticated users away from `/connect`, `/login`, and `/signup` to `/profile`.
+- Fixed the logged-in footer layout so the remaining footer buttons stay evenly distributed when `Connect` is hidden.
+- Tested both `isAuthenticated = true` and `isAuthenticated = false` states to check footer links, connect-page access, and auth-gated navigation behavior.
+- Restored the italic pending-request notice and fixed the CSS specificity issue that had kept one profile section title brown.
+- Current status: frontend-only cleanup completed, backend/database integration still pending.
+- Add-recipe page follow-up items still pending:
+  - add safety and spam protections so the add-recipe flow is harder to abuse or troll
+  - add picture-box notice text that clearly states a minimum of 2 and maximum of 6 pictures are required
+  - add one more picture upload section in the picture box flow
+  - continue fixing the add-recipe page after the database-backed submission path is ready
+
 ## 2026-07-29
 
 ### Task

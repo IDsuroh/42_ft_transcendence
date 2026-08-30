@@ -1,7 +1,16 @@
 import { Link } from 'react-router-dom'
-import { getCategoryPath, landingRecipeCategories } from '../data/siteData'
+import {
+  getCategoryPath,
+  isViewerAuthenticated,
+  landingRecipeCategories,
+} from '../data/siteData'
 
 function SiteFooter() {
+  const isAuthenticated = isViewerAuthenticated()
+  const footerLinksClassName = isAuthenticated
+    ? 'site-footer__links site-footer__links--authenticated'
+    : 'site-footer__links'
+
   return (
     <footer className="site-footer">
       <div className="content-frame site-footer__inner">
@@ -19,16 +28,18 @@ function SiteFooter() {
         </section>
 
         <div className="site-footer__aside">
-          <nav className="site-footer__links" aria-label="Footer links">
+          <nav className={footerLinksClassName} aria-label="Footer links">
             <Link className="footer-link" to="/terms">
               Terms
             </Link>
             <Link className="footer-link" to="/privacy">
               Privacy
             </Link>
-            <Link className="footer-link" to="/connect">
-              Connect
-            </Link>
+            {!isAuthenticated ? (
+              <Link className="footer-link" to="/connect">
+                Connect
+              </Link>
+            ) : null}
           </nav>
 
           <nav className="site-footer__category-list" aria-label="Footer categories">
