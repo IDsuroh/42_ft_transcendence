@@ -1,21 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { viewer } from '../data/siteData'
-
-const menuRecipeTypeLabels = [
-  'Starter',
-  'Main',
-  'Dessert',
-  'Drinks',
-  'Soups',
-  'Etc.',
-]
-
-const menuThemeLabels = [
-  'Cheap',
-  'Easy and fast',
-  'Top Recipes',
-]
+import { menuRecipeTypeLabels, menuThemeLabels, viewer } from '../data/siteData'
 
 function handleMenuPlaceholderClick() {}
 

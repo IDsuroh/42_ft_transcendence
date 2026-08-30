@@ -3,6 +3,46 @@ export const viewer = {
   name: '',
 }
 
+export const sampleRecipeSlug = 'sample-recipe'
+export const sampleRecipePath = `/recipe/${sampleRecipeSlug}`
+
+export const menuRecipeTypeLabels = [
+  'Starter',
+  'Main',
+  'Dessert',
+  'Drinks',
+  'Soups',
+  'Etc.',
+]
+
+export const menuThemeLabels = [
+  'Cheap',
+  'Easy and fast',
+  'Top Recipes',
+]
+
+function createCategoryId(prefix, label) {
+  return `${prefix}-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+}
+
+function createCategorySlug(label) {
+  return label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export const recipeCategories = menuRecipeTypeLabels.map((label) => ({
+  id: createCategoryId('recipe-type', label),
+  slug: createCategorySlug(label),
+  label: 'Recipe type',
+  name: label,
+}))
+
+export const landingRecipeCategories = recipeCategories.filter(
+  (category) => category.name !== 'Etc.',
+)
+
 export const recipes = []
 
 export const profilePreview = {
@@ -16,6 +56,14 @@ export const profilePreview = {
 }
 
 export const pendingRecipes = []
+
+export function getCategoryBySlug(slug) {
+  return recipeCategories.find((category) => category.slug === slug) ?? null
+}
+
+export function getCategoryPath(slug) {
+  return slug ? `/category/${slug}` : '/category'
+}
 
 export function getRecipeBySlug(slug) {
   return recipes.find((recipe) => recipe.slug === slug) ?? null
@@ -45,19 +93,36 @@ export function getLatestRecipes(limit = 4) {
   return sortByDate(recipes).slice(0, limit)
 }
 
+export function getRecipesByCategory(slug) {
+  const category = getCategoryBySlug(slug)
+
+  if (!category) {
+    return []
+  }
+
+  return sortByDate(
+    recipes.filter((recipe) => createCategorySlug(recipe.type) === category.slug),
+  )
+}
+
 export function getSuggestedRecipes(recipe, limit = 3) {
+  const recipeThemes = Array.isArray(recipe?.themes) ? recipe.themes : []
+  const recipeTags = Array.isArray(recipe?.tags) ? recipe.tags : []
+
   const ranked = recipes
     .filter((candidate) => candidate.slug !== recipe.slug)
     .map((candidate) => {
+      const candidateThemes = Array.isArray(candidate.themes) ? candidate.themes : []
+      const candidateTags = Array.isArray(candidate.tags) ? candidate.tags : []
       let score = 0
 
       if (candidate.type === recipe.type) {
         score += 3
       }
 
-      score += candidate.themes.filter((theme) => recipe.themes.includes(theme)).length * 2
-      score += candidate.tags.filter((tag) => recipe.tags.includes(tag)).length
-      score += candidate.popularity / 100
+      score += candidateThemes.filter((theme) => recipeThemes.includes(theme)).length * 2
+      score += candidateTags.filter((tag) => recipeTags.includes(tag)).length
+      score += (typeof candidate.popularity === 'number' ? candidate.popularity : 0) / 100
 
       return { recipe: candidate, score }
     })
@@ -79,12 +144,14 @@ export function searchRecipes(query) {
       recipe.summary,
       recipe.author,
       recipe.type,
-      ...recipe.themes,
-      ...recipe.tags,
-      ...recipe.ingredients,
+      ...(Array.isArray(recipe.themes) ? recipe.themes : []),
+      ...(Array.isArray(recipe.tags) ? recipe.tags : []),
+      ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : []),
     ]
 
-    return searchableBits.some((bit) => bit.toLowerCase().includes(normalized))
+    return searchableBits.some(
+      (bit) => typeof bit === 'string' && bit.toLowerCase().includes(normalized),
+    )
   })
 }
 

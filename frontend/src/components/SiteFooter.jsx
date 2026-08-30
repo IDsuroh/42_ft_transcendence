@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { getCategoryPath, landingRecipeCategories } from '../data/siteData'
 
 function SiteFooter() {
   return (
@@ -17,17 +18,31 @@ function SiteFooter() {
           </div>
         </section>
 
-        <nav className="site-footer__links" aria-label="Footer links">
-          <Link className="footer-link" to="/terms">
-            Terms
-          </Link>
-          <Link className="footer-link" to="/privacy">
-            Privacy
-          </Link>
-          <Link className="footer-link" to="/connect">
-            Connect
-          </Link>
-        </nav>
+        <div className="site-footer__aside">
+          <nav className="site-footer__links" aria-label="Footer links">
+            <Link className="footer-link" to="/terms">
+              Terms
+            </Link>
+            <Link className="footer-link" to="/privacy">
+              Privacy
+            </Link>
+            <Link className="footer-link" to="/connect">
+              Connect
+            </Link>
+          </nav>
+
+          <nav className="site-footer__category-list" aria-label="Footer categories">
+            {landingRecipeCategories.map((category) => (
+              <Link
+                key={category.id}
+                className="footer-category-link"
+                to={getCategoryPath(category.slug)}
+              >
+                {category.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </div>
     </footer>
   )

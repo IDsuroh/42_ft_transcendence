@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom'
-
 function AuthPageShell({
   introEyebrow,
   introTitle,
@@ -14,14 +12,6 @@ function AuthPageShell({
     <div className="content-frame auth-shell">
       <div className="auth-shell__frame auth-grid">
         <section className="auth-card">
-          <Link className="auth-card__brand" to="/">
-            <span className="auth-card__brand-mark">RS</span>
-            <span className="auth-card__brand-copy">
-              <strong>Recipe Site</strong>
-              <span>Back to landing page</span>
-            </span>
-          </Link>
-
           <div className="auth-card__title">
             <p className="eyebrow">{introEyebrow}</p>
             <h1>{introTitle}</h1>

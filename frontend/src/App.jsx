@@ -4,7 +4,6 @@ import SiteHeader from './components/SiteHeader'
 import SiteFooter from './components/SiteFooter'
 import AddRecipePage from './pages/AddRecipePage'
 import AdminPage from './pages/AdminPage'
-import CategoryDetailPage from './pages/CategoryDetailPage'
 import CategoryPage from './pages/CategoryPage'
 import ConnectPage from './pages/ConnectPage'
 import HomePage from './pages/HomePage'
@@ -31,8 +30,8 @@ function AppShell() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/home" element={<Navigate replace to="/" />} />
-          <Route path="/category" element={<CategoryPage />} />
-          <Route path="/category/:slug" element={<CategoryDetailPage />} />
+          <Route path="/category" element={<Navigate replace to="/" />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/recipe/:slug" element={<RecipePage />} />
           <Route path="/results/search" element={<SearchResultsPage />} />
           <Route path="/connect" element={<ConnectPage />} />

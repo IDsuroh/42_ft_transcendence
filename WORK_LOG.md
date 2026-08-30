@@ -31,6 +31,20 @@ Use this structure for future entries:
 - Important findings, blockers, or decisions
 ```
 
+## Teammate Report Format
+
+Use this structure for teammate-facing reports, including reports saved in `WORK_LOG.md`:
+
+```md
+Teammate Report (Month DD, YYYY)
+
+- Short bullet describing a concrete change.
+- Short bullet describing another concrete change.
+- Current status: short state summary such as frontend-only, backend pending, or blocked.
+```
+
+Keep the bullets concise and concrete, and end each report with a `Current status:` line.
+
 ## Explanation Protocol
 
 Use this protocol whenever the user asks for a code explanation, logic walkthrough, or architecture explanation in this repository.
@@ -528,27 +542,60 @@ Use this protocol whenever the user asks for a code explanation, logic walkthrou
 - Runtime verification could not be completed in this shell because `node` and `npm` are unavailable here, so today's checks were limited to source inspection
 
 ### Teammate Report 1
-- Worked on the frontend routing structure.
-- `React Router` = the frontend routing system that decides which React page/component to show when the URL changes.
-- `URL identifier` = the value inside the URL that tells the app which specific record to load, for example a slug or an id.
-- Difference between them:
-- `React Router` chooses the page type.
-- The URL identifier chooses the specific data for that page.
-- Example:
-- Router is for which page in the whole site.
-- `/login/`, `/admin/`, `/recipe/`, etc.
-- Identifier is for which specific data within those respective pages.
-- `/login/who/`, `/recipe/examplefood/`, etc.
-- Used React Router + slug in my case.
-- Left untouched for later:
-- The homepage recipe image/name boxes are still just clickable no-op buttons for now.
-- Nothing is connected to backend/database data yet.
-- Real recipe-page redirection and real data loading are for later development.
+Teammate Report (August 26, 2026)
+
+- Worked on the frontend routing structure with `React Router` and slug-based URLs.
+- Split the routing logic so the route decides which page to show and the URL identifier decides which specific record to load.
+- Left the homepage recipe image and name boxes as clickable no-op placeholders for now.
+- Current status: recipe-page redirection and real backend/database-connected data loading are still for later development.
 
 ### Teammate Report 2
-- Main focus: landing page, category page, category detail page, and auth page cleanup.
-- Landing page: added visible top-category cards and kept a `See more Categories` entry into the category flow.
-- Category page: added the main category directory layout with `Top 5 categories`, `All categories`, square cards, and centered pagination.
-- Category detail page: built one sample category view for `Category 01` with a trending recipe block and a list of sample recipes.
-- Login and signup pages: cleaned up the copy and kept them aligned with the shared frontend layout.
-- Current status: category work is still frontend-only placeholder behavior with no backend or database connection yet.
+Teammate Report (August 26, 2026)
+
+- Added visible top-category cards on the landing page and kept a `See more Categories` entry into the category flow.
+- Built the category page layout with `Top 5 categories`, `All categories`, square cards, and centered pagination.
+- Built one sample `Category 01` detail page with a trending recipe block and a list of sample recipes.
+- Cleaned up the login and signup page copy so those pages stay aligned with the shared frontend layout.
+- Current status: the category flow is still frontend-only placeholder behavior with no backend or database connection yet.
+
+## 2026-08-28
+
+### Task
+- Restore the category recipe-listing route structure and clean up the login/signup layout based on the user's corrections
+
+### Actions
+- Restored direct category detail routing in `frontend/src/App.jsx` with `/category/:slug`
+- Kept `/category` as a redirect back to `/` so there is no separate category landing page
+- Updated the landing-page category cards in `frontend/src/pages/HomePage.jsx` so each category button redirects to its matching `/category/:slug` route
+- Added minimal category metadata and category-filter helpers in `frontend/src/data/siteData.js` without reintroducing mock recipe records
+- Recreated `frontend/src/pages/CategoryPage.jsx` as a structural category listing page that filters the shared `recipes` array by category slug and shows an empty state when no real recipes exist
+- Removed the top `Recipe Site / Back to landing page` block from the shared auth shell in `frontend/src/components/AuthPageShell.jsx`
+- Adjusted the auth grid in `frontend/src/App.css` so the left login/signup info box no longer stretches to the height of the form box
+- Removed the normal category-page back button, while keeping the invalid-category fallback link pointed to the main landing page
+
+### Notes
+- No mock recipe content was intentionally kept for this work; `frontend/src/data/siteData.js` still uses an empty `recipes` array
+- Because the shared recipe source is still empty, the restored category page structure will currently show the empty-state message until real recipe data is connected
+- Runtime verification could not be completed in this shell because `node` and `npm` are unavailable here
+- Future continuation note: when the user later provides a queue for a report about work done on August 28, 2026, use today's work context from this entry
+
+## 2026-08-30
+
+### Task
+- Save the user's August 30 teammate report and standardize the teammate-report format for future entries, including the report text stored in `WORK_LOG.md`
+
+### Actions
+- Added a dedicated teammate-report format section near the top of this log
+- Rewrote the saved August 26 teammate reports into the new `Teammate Report (Month DD, YYYY)` format
+- Recorded the user's August 30 teammate report text in the new format
+
+### Notes
+- Use this teammate-report structure for future reports unless the user asks for a different format
+- Saved report text:
+
+Teammate Report (August 30, 2026)
+
+- Simplified the category page layout by removing the extra placeholder heading and helper text.
+- Cleaned up the recipe page comments section by removing the extra title and copy and merging the empty comments area into a single box.
+- Unified the button styling on the connect, login, and signup pages so those action buttons now use the same white style.
+- Current status: this was frontend UI cleanup only. Backend and data connection are still for later.
