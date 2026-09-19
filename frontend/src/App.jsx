@@ -38,11 +38,13 @@ function PublicOnlyRoute({ children }) {
 function AppShell() {
   const location = useLocation()
   const isHomePage = location.pathname === '/'
+  const knownPathPattern = /^(?:\/|\/home|\/category(?:\/[^/]+)?|\/recipe\/[^/]+|\/results\/search|\/connect|\/login|\/signup|\/add-recipe(?:\/submitted)?|\/profile|\/admin(?:\/review\/[^/]+)?|\/privacy|\/terms)$/
+  const hideShell = !knownPathPattern.test(location.pathname)
   const mainClassName = isHomePage ? 'page-main page-main--home' : 'page-main'
 
   return (
     <div className="site-frame">
-      <SiteHeader />
+      {!hideShell && <SiteHeader />}
 
       <main className={mainClassName}>
         <Routes>
@@ -101,7 +103,7 @@ function AppShell() {
         </Routes>
       </main>
 
-      <SiteFooter />
+      {!hideShell && <SiteFooter />}
     </div>
   )
 }
