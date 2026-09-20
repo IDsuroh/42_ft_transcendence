@@ -1151,19 +1151,6 @@
   text-align: center;
 }
 
-.profile-preview-grid {
-  margin-top: 0;
-}
-
-.profile-preview-card {
-  position: relative;
-}
-
-.profile-preview-card__image {
-  position: relative;
-  overflow: hidden;
-}
-
 .profile-page__add-recipe-row {
   margin-top: 18px;
   display: flex;
@@ -1173,39 +1160,6 @@
 .connect-page {
   display: grid;
   gap: 18px;
-}
-
-.dev-auth-preview {
-  width: min(1180px, 100%);
-  margin: 0 auto;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.dev-auth-preview__button {
-  display: grid;
-  place-items: center;
-  width: 118px;
-  height: 118px;
-  padding: 14px;
-  border: 3px solid #5c1366;
-  border-radius: 999px;
-  background: #b6ff00;
-  color: #5c1366;
-  font-size: 0.82rem;
-  font-weight: 800;
-  line-height: 1.15;
-  text-align: center;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.dev-auth-preview__button:hover {
-  background: #8ef70f;
-}
-
-.profile-page__dev-preview {
-  margin-top: 22px;
 }
 
 .field {

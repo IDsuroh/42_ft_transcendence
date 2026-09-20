@@ -13,14 +13,13 @@ import NotFoundPage from './pages/NotFoundPage'
 import PrivacyPage from './pages/PrivacyPage'
 import ProfilePage from './pages/ProfilePage'
 import RecipePage from './pages/RecipePage'
-import ReviewRequestPage from './pages/ReviewRequestPage'
 import SearchResultsPage from './pages/SearchResultsPage'
 import SignupPage from './pages/SignupPage'
 import TermsPage from './pages/TermsPage'
-import { isViewerAuthenticated } from './data/siteData'
+import { isAuthenticated } from './auth'
 
 function ProtectedRoute({ children }) {
-  if (!isViewerAuthenticated()) {
+  if (!isAuthenticated()) {
     return <Navigate replace to="/connect" />
   }
 
@@ -28,8 +27,8 @@ function ProtectedRoute({ children }) {
 }
 
 function PublicOnlyRoute({ children }) {
-  if (isViewerAuthenticated()) {
-    return <Navigate replace to="/profile" />
+  if (isAuthenticated()) {
+    return <Navigate replace to="/" />
   }
 
   return children
@@ -42,15 +41,15 @@ function AppShell() {
 
   return (
     <div className="site-frame">
-      <SiteHeader />
+      <SiteHeader key={location.key} />
 
       <main className={mainClassName}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/home" element={<Navigate replace to="/" />} />
-          <Route path="/category" element={<Navigate replace to="/" />} />
-          <Route path="/category/:slug" element={<CategoryPage />} />
-          <Route path="/recipe/:slug" element={<RecipePage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/category/:id" element={<CategoryPage />} />
+          <Route path="/recipe/:title" element={<RecipePage />} />
           <Route path="/results/search" element={<SearchResultsPage />} />
           <Route
             path="/connect"
@@ -92,9 +91,8 @@ function AppShell() {
               </ProtectedRoute>
             }
           />
-          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/review/:slug" element={<ReviewRequestPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<NotFoundPage />} />

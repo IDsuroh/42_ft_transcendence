@@ -1,140 +1,72 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import {
-  getCategoryPath,
-  landingRecipeCategories,
-  sampleRecipePath,
-  sampleRecipeSlug,
-} from '../data/siteData'
-
-const popularPlaceholders = Array.from({ length: 5 }, (_, index) => ({
-  id: `popular-${index + 1}`,
-  slug: sampleRecipeSlug,
-  label: 'Recipe image',
-  name: 'Recipe name',
-}))
-
-const latestPlaceholders = Array.from({ length: 4 }, (_, index) => ({
-  id: `latest-${index + 1}`,
-  slug: sampleRecipeSlug,
-  title: 'Recipe name',
-  posted: 'Posted x minutes ago',
-}))
+import { requestJson } from '../api'
+import { BackendError } from '../components/BackendResponse'
 
 function HomePage() {
   const location = useLocation()
+  const [landingData, setLandingData] = useState(null)
+  const [categories, setCategories] = useState(null)
+  const [error, setError] = useState('')
+  const [categoryError, setCategoryError] = useState('')
 
   useEffect(() => {
-    if (!location.hash) {
-      return undefined
-    }
+    let active = true
+    requestJson('/api/recipes/')
+      .then((data) => {
+        if (!Array.isArray(data.best_average) || !Array.isArray(data.most_reviews)) {
+          throw new Error('The recipe response is missing the best_average or most_reviews array.')
+        }
+        if (active) setLandingData(data)
+      })
+      .catch((requestError) => { if (active) setError(requestError) })
+    requestJson('/api/recipes/add_recipe/')
+      .then((data) => {
+        if (!Array.isArray(data.categories)) {
+          throw new Error('The recipe options response is missing the categories array.')
+        }
+        if (active) setCategories(data.categories)
+      })
+      .catch((requestError) => { if (active) setCategoryError(requestError) })
+    return () => { active = false }
+  }, [])
 
-    const targetId = location.hash.slice(1)
+  useEffect(() => {
+    if (!location.hash) return undefined
     const frameId = window.requestAnimationFrame(() => {
-      const target = document.getElementById(targetId)
-      target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
-
-    return () => {
-      window.cancelAnimationFrame(frameId)
-    }
+    return () => window.cancelAnimationFrame(frameId)
   }, [location.hash])
 
-  function handlePlaceholderClick() {}
+  const bestAverage = Array.isArray(landingData?.best_average) ? landingData.best_average : []
+  const mostReviews = Array.isArray(landingData?.most_reviews) ? landingData.most_reviews : []
 
   return (
     <div className="content-frame landing-plain">
       <section className="landing-plain__section" aria-labelledby="popular-section-title">
-        <div className="landing-plain__titlebar">
-          <h1 id="popular-section-title">Most popular recipes over 24h</h1>
-        </div>
-
+        <div className="landing-plain__titlebar"><h1 id="popular-section-title">Best average ratings</h1></div>
+        {error ? <BackendError error={error} /> : null}
+        {!landingData && !error ? <p>Loading recipes…</p> : null}
+        {landingData && bestAverage.length === 0 ? <p className="empty-state">No recipe records were returned by the backend.</p> : null}
         <div className="landing-plain__popular-grid">
-          {popularPlaceholders.map((item) => (
-            <Link
-              key={item.id}
-              to={item.slug ? `/recipe/${item.slug}` : sampleRecipePath}
-              className="landing-plain__popular-card landing-plain__card-button"
-              data-recipe-slug={item.slug}
-            >
-              <div className="landing-plain__image-placeholder" aria-hidden="true">
-                {item.label}
-              </div>
-              <div className="landing-plain__caption">{item.name}</div>
-            </Link>
-          ))}
+          {bestAverage.map((recipe) => <Link key={recipe.id} to={`/recipe/${encodeURIComponent(recipe.title)}`} className="landing-plain__popular-card landing-plain__card-button"><div className="landing-plain__image-placeholder" aria-hidden="true">Recipe image</div><div className="landing-plain__caption">{recipe.title}</div></Link>)}
         </div>
-
-        <button
-          type="button"
-          className="header-button landing-plain__action"
-          onClick={handlePlaceholderClick}
-        >
-          See more
-        </button>
       </section>
-
       <section className="landing-plain__section" aria-labelledby="latest-section-title">
-        <div className="landing-plain__titlebar">
-          <h2 id="latest-section-title">Latest recipes</h2>
-          <p>Restricted to a fixed amount for now.</p>
-        </div>
-
+        <div className="landing-plain__titlebar"><h2 id="latest-section-title">Most reviewed recipes</h2></div>
+        {landingData && mostReviews.length === 0 ? <p className="empty-state">No recipe records were returned by the backend.</p> : null}
         <div className="landing-plain__latest-grid">
-          {latestPlaceholders.map((item) => (
-            <Link
-              key={item.id}
-              to={item.slug ? `/recipe/${item.slug}` : sampleRecipePath}
-              className="landing-plain__latest-card landing-plain__card-button"
-              data-recipe-slug={item.slug}
-            >
-              <div className="landing-plain__latest-image" aria-hidden="true">
-                Recipe image
-              </div>
-
-              <div className="landing-plain__latest-copy">
-                <h3>{item.title}</h3>
-                <p>{item.posted}</p>
-              </div>
-            </Link>
-          ))}
+          {mostReviews.map((recipe) => <Link key={recipe.id} to={`/recipe/${encodeURIComponent(recipe.title)}`} className="landing-plain__latest-card landing-plain__card-button"><div className="landing-plain__latest-image" aria-hidden="true">Recipe image</div><div className="landing-plain__latest-copy"><h3>{recipe.title}</h3></div></Link>)}
         </div>
-
-        <button
-          type="button"
-          className="header-button landing-plain__action"
-          onClick={handlePlaceholderClick}
-        >
-          See more
-        </button>
       </section>
-
-      <section
-        id="categories"
-        className="landing-plain__section landing-plain__section--categories"
-        aria-labelledby="landing-top-categories-title"
-      >
-        <div className="landing-plain__titlebar">
-          <h2 id="landing-top-categories-title">Categories</h2>
-        </div>
-
+      <section id="categories" className="landing-plain__section landing-plain__section--categories" aria-labelledby="landing-top-categories-title">
+        <div className="landing-plain__titlebar"><h2 id="landing-top-categories-title">Categories</h2></div>
+        {categoryError ? <BackendError error={categoryError} /> : null}
+        {!categories && !categoryError ? <p>Loading categories…</p> : null}
+        {categories?.length === 0 ? <p className="empty-state">No categories were returned by the backend.</p> : null}
         <div className="category-browser__top-grid">
-          {landingRecipeCategories.map((category) => (
-            <Link
-              key={category.id}
-              id={category.id}
-              to={getCategoryPath(category.slug)}
-              className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"
-            >
-              <div
-                className="landing-plain__image-placeholder category-browser__image"
-                aria-hidden="true"
-              >
-                {category.label}
-              </div>
-              <div className="landing-plain__caption">{category.name}</div>
-            </Link>
-          ))}
+          {categories?.map((category) => <Link key={category.id} id={`category-${category.id}`} to={`/category/${category.id}`} className="landing-plain__popular-card landing-plain__card-button category-browser__tile category-browser__tile--top"><div className="landing-plain__image-placeholder category-browser__image" aria-hidden="true">Category</div><div className="landing-plain__caption">{category.name}</div></Link>)}
         </div>
       </section>
     </div>

@@ -1,50 +1,70 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AuthPageShell from '../components/AuthPageShell'
+import { saveAuthSession } from '../auth'
+import { requestJson } from '../api'
 
 function LoginPage() {
-  const [email, setEmail] = useState('')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [status, setStatus] = useState(
-    'Frontend auth layout is ready. Django login wiring comes next.',
-  )
+  const [status, setStatus] = useState(location.state?.signupSuccess ?? '')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
 
-    if (!email.trim() || !password) {
-      setStatus('Enter both email and password before continuing.')
-      return
-    }
+    if (submitting) return
+    setSubmitting(true)
+    setError(null)
+    setStatus('Signing in…')
 
-    setStatus(
-      'Login form validated on the frontend. The next step is connecting this layout to Django session endpoints.',
-    )
+    try {
+      const data = await requestJson('/api/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username.trim(), password }),
+      })
+      if (typeof data?.token !== 'string' || !data.token) {
+        throw new Error('The login response did not include an authentication token.')
+      }
+
+      saveAuthSession({ token: data.token })
+      navigate('/', { replace: true })
+    } catch (error) {
+      setStatus('')
+      setError(error)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
     <AuthPageShell
       introEyebrow="Login page"
       introTitle="Welcome back to your kitchen corner."
-      introDescription="Sign in to pick up where you left off, revisit saved recipes, and keep your own food space in one place."
+      introDescription="Log in with the credentials you chose when registering."
       bullets={[
-        'Find your saved recipes without digging for them again.',
-        'Get back to the dishes you meant to try next.',
-        'Keep your account ready for sharing and saving more later.',
+        'Enter your username and password.',
+        'New here? Create an account first.',
+        'After logging in, you will return to the main page.',
       ]}
       formEyebrow="Sign in"
       formTitle="Log in"
       status={status}
+      error={error}
     >
       <form className="field-list" onSubmit={handleSubmit} style={{ marginTop: '18px' }}>
         <div className="field">
-          <label htmlFor="login-email">Email</label>
+          <label htmlFor="login-username">Username</label>
           <input
-            id="login-email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
+            id="login-username"
+            type="text"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            placeholder="Your username"
           />
         </div>
 
@@ -60,7 +80,7 @@ function LoginPage() {
         </div>
 
         <div className="auth-card__actions">
-          <button type="submit" className="button button--ghost">
+          <button type="submit" className="button button--ghost" disabled={submitting}>
             Continue
           </button>
           <Link className="button button--ghost" to="/signup">

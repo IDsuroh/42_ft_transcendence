@@ -1,226 +1,186 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PageHero from '../components/PageHero'
-import { recipeCategories, recipes } from '../data/siteData'
+import { getAuthToken } from '../auth'
+import { requestJson } from '../api'
+import { BackendError } from '../components/BackendResponse'
 
-function getIngredientOptions() {
-  return Array.from(
-    new Set(
-      recipes.flatMap((recipe) =>
-        Array.isArray(recipe.ingredients)
-          ? recipe.ingredients.filter(
-              (ingredient) => typeof ingredient === 'string' && ingredient.trim(),
-            )
-          : [],
-      ),
-    ),
-  ).sort((left, right) => left.localeCompare(right))
-}
+const ingredientRow = () => ({ name: '', quantity: '', unit: '' })
 
 function AddRecipePage() {
   const navigate = useNavigate()
-  const ingredientOptions = getIngredientOptions()
+  const [options, setOptions] = useState(null)
+  const [optionsError, setOptionsError] = useState('')
   const [recipeName, setRecipeName] = useState('')
-  const [ingredients, setIngredients] = useState([''])
+  const [ingredients, setIngredients] = useState([ingredientRow()])
   const [categories, setCategories] = useState([''])
   const [steps, setSteps] = useState([''])
-  const [pictures, setPictures] = useState([0])
+  const [status, setStatus] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
-  function handleSubmit(event) {
+  useEffect(() => {
+    let active = true
+    requestJson('/api/recipes/add_recipe/')
+      .then((data) => {
+        if (!Array.isArray(data.categories) || !Array.isArray(data.ingredients)) {
+          throw new Error('The recipe options response is missing categories or ingredients.')
+        }
+        if (active) setOptions(data)
+      })
+      .catch((error) => { if (active) setOptionsError(error) })
+    return () => { active = false }
+  }, [])
+
+  function updateIngredient(index, field, value) {
+    setIngredients((rows) => rows.map((row, rowIndex) => (
+      rowIndex === index ? { ...row, [field]: value } : row
+    )))
+  }
+
+  function updateAt(setter, index, value) {
+    setter((rows) => rows.map((row, rowIndex) => rowIndex === index ? value : row))
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault()
-
-    const trimmedRecipeName = recipeName.trim()
-
-    if (!trimmedRecipeName) {
-      return
+    if (submitting) return
+    setSubmitting(true)
+    setError(null)
+    setStatus('Submitting…')
+    const token = getAuthToken()
+    const payload = {
+      title: recipeName,
+      ingredients,
+      categories: categories.filter(Boolean).map((name) => ({ name })),
+      steps: steps.filter(Boolean).map((instruction, index) => ({
+        step_number: index + 1,
+        instruction,
+      })),
+      reviews: [],
     }
 
-    navigate('/add-recipe/submitted')
-  }
-
-  function updateIngredient(index, value) {
-    setIngredients((current) =>
-      current.map((ingredient, ingredientIndex) =>
-        ingredientIndex === index ? value : ingredient,
-      ),
-    )
-  }
-
-  function updateCategory(index, value) {
-    setCategories((current) =>
-      current.map((category, categoryIndex) => (categoryIndex === index ? value : category)),
-    )
-  }
-
-  function updateStep(index, value) {
-    setSteps((current) =>
-      current.map((step, stepIndex) => (stepIndex === index ? value : step)),
-    )
-  }
-
-  function addIngredientField() {
-    setIngredients((current) => [...current, ''])
-  }
-
-  function addCategoryField() {
-    setCategories((current) => [...current, ''])
-  }
-
-  function addStepField() {
-    setSteps((current) => [...current, ''])
-  }
-
-  function addPictureField() {
-    setPictures((current) => [...current, current.length])
+    // Login returns only a token. No user ID is guessed or taken from the public
+    // users list; the API must report its missing-author validation itself.
+    try {
+      const recipe = await requestJson('/api/recipes/add_recipe/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Token ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      })
+      if (!Number.isInteger(recipe?.id) || typeof recipe.title !== 'string') {
+        throw new Error('The submission response did not include a created recipe.')
+      }
+      navigate('/add-recipe/submitted', { state: { recipe } })
+    } catch (error) {
+      setStatus('')
+      setError(error)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
     <div className="content-frame">
       <PageHero eyebrow="Add recipe" title="Add recipe" />
-
       <section className="page-section">
         <form className="dynamic-list" onSubmit={handleSubmit}>
+          {optionsError ? <BackendError error={optionsError} /> : null}
+          {!options && !optionsError ? <p>Loading recipe options…</p> : null}
           <article className="form-panel">
             <div className="form-panel__body field-list">
               <div className="field">
                 <label htmlFor="recipe-name">Recipe name</label>
-                <input
-                  id="recipe-name"
-                  type="text"
-                  value={recipeName}
-                  onChange={(event) => setRecipeName(event.target.value)}
-                  required
-                />
+                <input id="recipe-name" value={recipeName} onChange={(event) => setRecipeName(event.target.value)} required />
               </div>
             </div>
           </article>
-
           <div className="split-grid">
             <article className="form-panel">
               <h3>Ingredients</h3>
               <div className="form-panel__body dynamic-list">
                 {ingredients.map((ingredient, index) => (
-                  <div key={`ingredient-${index + 1}`} className="dynamic-card field-list">
+                  <div key={index} className="dynamic-card field-list">
                     <div className="field">
-                      <label htmlFor={`ingredient-${index + 1}`}>{`Ingredient ${index + 1}`}</label>
-                      <select
-                        id={`ingredient-${index + 1}`}
-                        value={ingredient}
-                        onChange={(event) => updateIngredient(index, event.target.value)}
-                        disabled={ingredientOptions.length === 0}
-                      >
-                        <option value="">
-                          {ingredientOptions.length > 0
-                            ? 'Select ingredient'
-                            : 'Ingredient list not available yet'}
-                        </option>
-                        {ingredientOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
+                      <label htmlFor={`ingredient-${index}`}>Ingredient {index + 1}</label>
+                      <select id={`ingredient-${index}`} value={ingredient.name} onChange={(event) => updateIngredient(index, 'name', event.target.value)} disabled={!options} required>
+                        <option value="">Select ingredient</option>
+                        {options?.ingredients.map((option) => <option key={option.id} value={option.name}>{option.name}</option>)}
                       </select>
+                    </div>
+                    <div className="field">
+                      <label htmlFor={`quantity-${index}`}>Quantity</label>
+                      <input id={`quantity-${index}`} value={ingredient.quantity} onChange={(event) => updateIngredient(index, 'quantity', event.target.value)} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor={`unit-${index}`}>Unit</label>
+                      <input id={`unit-${index}`} value={ingredient.unit} onChange={(event) => updateIngredient(index, 'unit', event.target.value)} required />
                     </div>
                   </div>
                 ))}
               </div>
               <div className="form-panel__actions">
-                <button
-                  type="button"
-                  className="button button--ghost"
-                  onClick={addIngredientField}
-                >
-                  Add ingredient
-                </button>
+                <button type="button" className="button button--ghost" onClick={() => setIngredients((rows) => [...rows, ingredientRow()])}>Add ingredient</button>
               </div>
             </article>
-
             <article className="form-panel">
               <h3>Categories</h3>
               <div className="form-panel__body dynamic-list">
                 {categories.map((category, index) => (
-                  <div key={`category-${index + 1}`} className="dynamic-card field-list">
+                  <div key={index} className="dynamic-card field-list">
                     <div className="field">
-                      <label htmlFor={`category-${index + 1}`}>{`Category ${index + 1}`}</label>
-                      <select
-                        id={`category-${index + 1}`}
-                        value={category}
-                        onChange={(event) => updateCategory(index, event.target.value)}
-                      >
+                      <label htmlFor={`category-${index}`}>Category {index + 1}</label>
+                      <select id={`category-${index}`} value={category} onChange={(event) => updateAt(setCategories, index, event.target.value)} disabled={!options}>
                         <option value="">Select category</option>
-                        {recipeCategories.map((option) => (
-                          <option key={option.id} value={option.slug}>
-                            {option.name}
-                          </option>
-                        ))}
+                        {options?.categories.map((option) => <option key={option.id} value={option.name}>{option.name}</option>)}
                       </select>
                     </div>
                   </div>
                 ))}
               </div>
               <div className="form-panel__actions">
-                <button
-                  type="button"
-                  className="button button--ghost"
-                  onClick={addCategoryField}
-                >
-                  Add category
-                </button>
+                <button type="button" className="button button--ghost" onClick={() => setCategories((rows) => [...rows, ''])}>Add category</button>
               </div>
             </article>
           </div>
-
           <article className="form-panel">
             <h3>Steps</h3>
+            <p className="empty-state">The backend currently treats steps as read-only; submitted steps will not be saved.</p>
             <div className="form-panel__body dynamic-list">
               {steps.map((step, index) => (
-                <div key={`step-${index + 1}`} className="dynamic-card field-list">
+                <div key={index} className="dynamic-card field-list">
                   <div className="field">
-                    <label htmlFor={`step-${index + 1}`}>{`Step ${index + 1}`}</label>
-                    <textarea
-                      id={`step-${index + 1}`}
-                      rows="4"
-                      value={step}
-                      onChange={(event) => updateStep(index, event.target.value)}
-                    />
+                    <label htmlFor={`step-${index}`}>Step {index + 1}</label>
+                    <textarea id={`step-${index}`} rows="4" value={step} onChange={(event) => updateAt(setSteps, index, event.target.value)} required />
                   </div>
                 </div>
               ))}
             </div>
             <div className="form-panel__actions">
-              <button type="button" className="button button--ghost" onClick={addStepField}>
-                Add step
-              </button>
+              <button type="button" className="button button--ghost" onClick={() => setSteps((rows) => [...rows, ''])}>Add step</button>
             </div>
           </article>
-
           <article className="form-panel">
             <h3>Pictures</h3>
             <div className="form-panel__body dynamic-list">
-              {pictures.map((pictureId, index) => (
-                <div key={`picture-${pictureId}`} className="dynamic-card field-list">
-                  <div className="field">
-                    <label htmlFor={`picture-${pictureId}`}>{`Picture ${index + 1}`}</label>
-                    <input id={`picture-${pictureId}`} type="file" accept="image/*" />
-                  </div>
+              <div className="dynamic-card field-list">
+                <div className="field">
+                  <label htmlFor="recipe-picture">Picture 1</label>
+                  <input id="recipe-picture" type="file" accept="image/*" disabled />
                 </div>
-              ))}
+              </div>
             </div>
             <div className="form-panel__actions">
-              <button
-                type="button"
-                className="button button--ghost"
-                onClick={addPictureField}
-              >
-                Add picture
-              </button>
+              <button type="button" className="button button--ghost" disabled>Add picture</button>
             </div>
           </article>
-
+          {status ? <p className="empty-state" role="status">{status}</p> : null}
+          {error ? <BackendError error={error} /> : null}
           <div className="form-panel__actions add-recipe-form__submit-row">
-            <button type="submit" className="button button--ghost">
-              Add recipe
-            </button>
+            <button type="submit" className="button button--ghost" disabled={submitting}>Add recipe</button>
           </div>
         </form>
       </section>
